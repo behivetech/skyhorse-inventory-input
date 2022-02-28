@@ -268,7 +268,9 @@ const Index = ({ shopOrigin }) => {
       loading: addProductLoading,
       reset: resetMutation,
     },
-  ] = useMutation(ADD_PRODUCT);
+  ] = useMutation(ADD_PRODUCT, {
+    onCompleted: () => window.scrollTo({ top: 0, behavior: "smooth" }),
+  });
   const renderInputField = {
     checkbox: (props) => <CheckboxControlled {...props} control={control} />,
     select: (props) => <SelectControlled {...props} control={control} />,
@@ -397,7 +399,8 @@ const Index = ({ shopOrigin }) => {
             <br />
             <Link url={getLink("barcode")} external>
               Print Barcode
-            </Link>
+            </Link>{" "}
+            {addProductData.productCreate.product.barcode}
           </p>
         </Banner>
       )}
