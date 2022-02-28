@@ -341,7 +341,7 @@ const Index = ({ shopOrigin }) => {
   }
 
   function getProductInputs(formData) {
-    const { pricePerCarat, type, mine, carat } = formData;
+    const { pricePerCarat, type, mine, carat, bin } = formData;
     const tags = [type, mine];
     const barcode = getBarcode(type);
 
