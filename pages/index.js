@@ -89,6 +89,22 @@ const ADD_PRODUCT = gql`
 `;
 
 const formFieldParams = {
+  bin: {
+    label: "Bin",
+    type: "number",
+    validation: yup.number().positive().required(),
+    inputFieldParams: {
+      fieldType: "text",
+    },
+  },
+  otherLocation: {
+    label: "Other Location",
+    type: "number",
+    validation: yup.number().positive().required(),
+    inputFieldParams: {
+      fieldType: "text",
+    },
+  },
   type: {
     label: "Type",
     type: "text",
@@ -102,20 +118,20 @@ const formFieldParams = {
           value: "",
         },
         {
-          label: "Turquoise",
-          value: "Turquoise",
-        },
-        {
-          label: "Variscite",
-          value: "Variscite",
+          label: "Gaspeite",
+          value: "Gaspeite",
         },
         {
           label: "Spiny Oyster",
           value: "Spiny Oyster",
         },
         {
-          label: "Gaspeite",
-          value: "Gaspeite",
+          label: "Turquoise",
+          value: "Turquoise",
+        },
+        {
+          label: "Variscite",
+          value: "Variscite",
         },
       ],
       placeholder: "Select a type",
@@ -142,12 +158,32 @@ const formFieldParams = {
           value: "Angel Wing, Nevada",
         },
         {
+          label: "Australia",
+          value: "Australia",
+        },
+        {
           label: "Cairico Lake, Nevada",
           value: "Cairico Lake, Nevada",
         },
         {
           label: "Hubei, China",
           value: "Hubei, China",
+        },
+        {
+          label: "Nacozari, Mexico",
+          value: "Nacozari, Mexico",
+        },
+        {
+          label: "Royston, Nevada",
+          value: "Royston, Nevada",
+        },
+        {
+          label: "Red Skin, China",
+          value: "Red Skin, China",
+        },
+        {
+          label: "Ma'anshan, China",
+          value: "Ma'anshan, China",
         },
       ],
     },
@@ -156,7 +192,7 @@ const formFieldParams = {
     label: "Carat",
     type: "number",
     validation: yup.number().positive().required(),
-    getDescriptionValue: (value) => `${value} ct`,
+    getDescriptionValue: (value) => `${value}ct`,
     inputFieldParams: {
       fieldType: "text",
     },
@@ -180,7 +216,7 @@ const formFieldParams = {
     label: "Length",
     type: "number",
     validation: yup.number().positive(),
-    getDescriptionValue: (value) => `${value} in`,
+    getDescriptionValue: (value) => `${value}in`,
     inputFieldParams: {
       fieldType: "text",
     },
@@ -189,7 +225,7 @@ const formFieldParams = {
     label: "Width",
     type: "number",
     validation: yup.number().positive(),
-    getDescriptionValue: (value) => `${value} in`,
+    getDescriptionValue: (value) => `${value}in`,
     inputFieldParams: {
       fieldType: "text",
     },
@@ -198,7 +234,7 @@ const formFieldParams = {
     label: "Height",
     type: "number",
     validation: yup.number().positive(),
-    getDescriptionValue: (value) => `${value} in`,
+    getDescriptionValue: (value) => `${value}in`,
     inputFieldParams: {
       fieldType: "text",
     },
@@ -209,7 +245,6 @@ const schema = yup.object(mapValues(formFieldParams, "validation")).required();
 
 const Index = ({ shopOrigin }) => {
   const [stabilized, setStabilized] = useState(false);
-  const [images, setImages] = useState([]);
   const handleChange = useCallback(
     (newChecked) => setStabilized(newChecked),
     []
@@ -254,8 +289,12 @@ const Index = ({ shopOrigin }) => {
     });
 
     if (!length && !width && !height) {
+      const contactLink = `<a href="${getLink(
+        contact
+      )}" target="_blank">contact form</a>`;
+
       detailRows.push(
-        '<tr><td colspan="2">Measurements available upon request through our contact form</td></tr>'
+        `<tr><td colspan="2">Measurements available upon request through our ${contactLink}</td></tr>`
       );
     }
 
@@ -344,14 +383,16 @@ const Index = ({ shopOrigin }) => {
     const { product, shop } = addProductData.productCreate;
     const linkTypes = {
       barcode: "/admin/apps/retail-labels-printer/print/preview?id=",
+      contact: "/pages/contact",
       productPage: "/admin/products/",
     };
+    const linkArray = [shop.url, linkTypes[linkType]];
 
-    return [
-      shop.url,
-      linkTypes[linkType],
-      product.id.split("/").slice(-1),
-    ].join("");
+    if (linkType !== "contact") {
+      linkArray.push(product.id.split("/").slice(-1));
+    }
+
+    return linkArray.join("");
   }
 
   async function onSubmit(formData) {
