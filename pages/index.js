@@ -289,9 +289,7 @@ const Index = ({ shopOrigin }) => {
     });
 
     if (!length && !width && !height) {
-      const contactLink = `<a href="${getLink(
-        "contact"
-      )}" target="_blank">contact form</a>`;
+      const contactLink = `<a href="/pages/contact" target="_blank">contact form</a>`;
 
       detailRows.push(
         `<tr><td colspan="2">Measurements, images or other information available upon request through our ${contactLink}</td></tr>`
