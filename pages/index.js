@@ -275,30 +275,6 @@ const Index = ({ shopOrigin }) => {
     text: (props) => <TextFieldControlled {...props} control={control} />,
   };
 
-  function renderHtmlRows(formData, index) {
-    const { length, width, height } = formData;
-    const detailRows = Object.keys(formFieldParams).map((key) => {
-      const value = formData[key];
-      const { label, getDescriptionValue } = formFieldParams[key];
-
-      return (
-        value &&
-        getDescriptionValue &&
-        `<tr><td>${label}</td><td>${getDescriptionValue(value)}</td></tr>`
-      );
-    });
-
-    if (!length && !width && !height) {
-      const contactLink = `<a href="/pages/contact" target="_blank">contact form</a>`;
-
-      detailRows.push(
-        `<tr><td colspan="2">Measurements, images or other information available upon request through our ${contactLink}</td></tr>`
-      );
-    }
-
-    return detailRows;
-  }
-
   function getRandomNumber(digitCount) {
     const powerOf10 = 10 ** digitCount;
     const sliceAmount = 0 - digitCount;
@@ -353,9 +329,6 @@ const Index = ({ shopOrigin }) => {
             stabilized ? ` (Stabilized)` : ""
           } - ${mine} - ${carat}ct`,
           vendor: "Skyhorse Industries",
-          descriptionHtml: `<table>${renderHtmlRows(formData).join(
-            ""
-          )}</table>`,
           handle: [...type.split(" "), barcode].join("-").toLowerCase(),
           metafields: Object.keys(formData).map((key) => ({
             key,
