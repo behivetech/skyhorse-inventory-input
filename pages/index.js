@@ -400,7 +400,10 @@ const Index = ({ shopOrigin }) => {
             <Link url={getLink("barcode")} external>
               Print Barcode
             </Link>{" "}
-            {addProductData.productCreate.product.barcode}
+            {
+              addProductData.productCreate.product.variants.edges[0].node
+                .barcode
+            }
           </p>
         </Banner>
       )}
