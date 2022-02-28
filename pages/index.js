@@ -22,44 +22,44 @@ import mapValues from "lodash.mapvalues";
 
 // const QUERY_PRODUCT = gql`
 // query products (first: 10) {
-//     edges {
-//     node {
-//         id
-//         metafields (first: 50) {
-//             edges{
-//                 node {
-//                         id
-//                         key
-//                     }
+//         edges {
+//         node {
+//                 id
+//                 metafields (first: 50) {
+//                         edges{
+//                                 node {
+//                                                 id
+//                                                 key
+//                                         }
+//                                 }
+//                         }
 //                 }
-//             }
 //         }
-//     }
 // }
 // `
 
 // const QUERY_METAFIELDS = gql`
-//     query GetMetafields {
-//         metafieldDefinitions (
-//             ownerType: PRODUCT,
-//             first: 20,
-//             sortKey: PINNED_POSITION,
-//             reverse: true
-//             ){
-//             edges {
-//                 node {
-//                     namespace
-//                     key
-//                     name
-//                     type {
-//                         name
-//                         category
-//                     }
-//                     validationStatus
+//         query GetMetafields {
+//                 metafieldDefinitions (
+//                         ownerType: PRODUCT,
+//                         first: 20,
+//                         sortKey: PINNED_POSITION,
+//                         reverse: true
+//                         ){
+//                         edges {
+//                                 node {
+//                                         namespace
+//                                         key
+//                                         name
+//                                         type {
+//                                                 name
+//                                                 category
+//                                         }
+//                                         validationStatus
+//                                 }
+//                         }
 //                 }
-//             }
 //         }
-//     }
 // `
 
 const ADD_PRODUCT = gql`
@@ -99,7 +99,7 @@ const formFieldParams = {
   },
   otherLocation: {
     label: "Other Location",
-    type: "number",
+    type: "text",
     validation: yup.number().positive().required(),
     inputFieldParams: {
       fieldType: "text",
