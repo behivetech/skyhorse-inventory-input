@@ -294,7 +294,7 @@ const Index = ({ shopOrigin }) => {
       )}" target="_blank">contact form</a>`;
 
       detailRows.push(
-        `<tr><td colspan="2">Measurements available upon request through our ${contactLink}</td></tr>`
+        `<tr><td colspan="2">Measurements, images or other information available upon request through our ${contactLink}</td></tr>`
       );
     }
 
@@ -313,7 +313,7 @@ const Index = ({ shopOrigin }) => {
       .slice(sliceAmount);
   }
 
-  function getSkuCode({ mine, type, carat }) {
+  function getSkuCode({ mine, type, barcode, bin }) {
     const typeCode = type.substring(0, 2).toUpperCase();
     const mineCode = mine
       .replace("#", "n")
@@ -322,9 +322,9 @@ const Index = ({ shopOrigin }) => {
       .join("")
       .substring(0, 4)
       .toUpperCase();
-    const dateNow = new Date();
+    const slot = barcode.toString().charAt(0);
 
-    return `${typeCode}-${mineCode}-${carat}-${getRandomNumber(3)}`;
+    return `${typeCode}-${mineCode}-B${bin}S${slot}-${getRandomNumber(3)}`;
   }
 
   function getBarcode() {
@@ -371,7 +371,7 @@ const Index = ({ shopOrigin }) => {
             {
               price: getPrice(pricePerCarat, carat),
               barcode,
-              sku: getSkuCode({ mine, type, carat }),
+              sku: getSkuCode({ mine, type, barcode, bin }),
             },
           ],
         },
