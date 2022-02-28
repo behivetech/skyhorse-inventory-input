@@ -100,7 +100,7 @@ const formFieldParams = {
   otherLocation: {
     label: "Other Location",
     type: "text",
-    validation: yup.number().positive().required(),
+    validation: yup.string(),
     inputFieldParams: {
       fieldType: "text",
     },
@@ -140,7 +140,7 @@ const formFieldParams = {
   mine: {
     label: "Mine",
     type: "text",
-    validation: yup.string().required(),
+    validation: yup.string(),
     getDescriptionValue: (value) => value,
     inputFieldParams: {
       fieldType: "select",
