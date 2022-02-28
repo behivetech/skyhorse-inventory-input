@@ -290,7 +290,7 @@ const Index = ({ shopOrigin }) => {
 
     if (!length && !width && !height) {
       const contactLink = `<a href="${getLink(
-        contact
+        "contact"
       )}" target="_blank">contact form</a>`;
 
       detailRows.push(
