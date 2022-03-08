@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
 
 export const QUERY_PRODUCT = gql`
-  query Products {
-    products(first: 20, query: "status:draft tag_not:ready") {
+  query Products($cursor: String) {
+    products(first: 10, after: $cursor) {
       edges {
+        cursor
         node {
           id
           defaultCursor

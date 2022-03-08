@@ -1,8 +1,9 @@
-import React, { useCallback, useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import React, { useCallback, useRef, useState } from "react";
+import { useQuery } from "@apollo/client";
 import {
   IndexTable,
   Modal,
+  Pagination,
   TextStyle,
   useIndexResourceState,
 } from "@shopify/polaris";
@@ -27,16 +28,28 @@ function priceFormat(price) {
 
 export default function ProductList() {
   const [showEditModal, setShowEditModal] = useState(false);
+  const cursors = useRef([undefined]);
+  const [afterCursor, setAfterCursor] = useState(undefined);
   const [editData, setEditData] = useState({});
   const handleEditOnClose = useCallback(
     () => setShowEditModal(!showEditModal),
     [showEditModal]
   );
   const {
-    data: { products: { edges: productRows } } = { products: { edges: [] } },
+    data: {
+      products: {
+        edges: productRows,
+        pageInfo: { hasNextPage, hasPreviousPage },
+      },
+    } = {
+      products: {
+        edges: [],
+        pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      },
+    },
     error,
     loading,
-  } = useQuery(QUERY_PRODUCT);
+  } = useQuery(QUERY_PRODUCT, { variables: { cursor: afterCursor } });
   const {
     selectedResources,
     allResourcesSelected,
@@ -69,6 +82,24 @@ export default function ProductList() {
   function handleEditClick(productId) {
     setEditData(productData.find(({ id }) => id === productId));
     setShowEditModal(true);
+  }
+
+  function handleOnNext() {
+    const nextCursor = productRows[productRows.length - 1].cursor;
+    const currentCursors = cursors.current;
+
+    if (!currentCursors.includes(nextCursor)) {
+      cursors.current = [...currentCursors, nextCursor];
+    }
+
+    setAfterCursor(nextCursor);
+  }
+
+  function handleOnPrevious() {
+    const currentCursors = cursors.current;
+    const previousCursorIndex = currentCursors.indexOf(afterCursor) - 1;
+
+    setAfterCursor(currentCursors[previousCursorIndex]);
   }
 
   return (
@@ -121,6 +152,12 @@ export default function ProductList() {
           </IndexTable.Row>
         ))}
       </IndexTable>
+      <Pagination
+        hasNext={hasNextPage}
+        hasPrevious={hasPreviousPage}
+        onNext={handleOnNext}
+        onPrevious={handleOnPrevious}
+      />
     </>
   );
 }
