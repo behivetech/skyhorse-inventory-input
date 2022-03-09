@@ -31,7 +31,11 @@ export default function ThumbnailWithZoom({ alt, src }) {
         >
             <Modal.Section>
                 {src ? (
-                    <img style={{ width: "100%" }} src={src} alt={alt} />
+                    <img
+                        style={{ width: "100%", marginBottom: "4rem" }}
+                        src={src}
+                        alt={alt}
+                    />
                 ) : (
                     <NoImage />
                 )}

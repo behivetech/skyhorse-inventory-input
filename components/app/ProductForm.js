@@ -192,7 +192,7 @@ export default function ProductForm({
                             return metafieldObject;
                         })
                         .filter(
-                            (inputObject) => inputObject?.value === undefined
+                            (inputObject) => inputObject?.value !== undefined
                         ),
                     status: "DRAFT",
                     seo: {
