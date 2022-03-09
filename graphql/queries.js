@@ -39,7 +39,7 @@ export const QUERY_PRODUCT = gql`
 `;
 export const QUERY_PRODUCT_APPROVAL = gql`
     query ProductApprovals($cursor: String, $query: String!) {
-        productVariants(first: 5, after: $cursor, query: $query) {
+        productVariants(first: 20, after: $cursor, query: $query) {
             pageInfo {
                 hasNextPage
             }
