@@ -96,7 +96,7 @@ export default function ProductForm({
         return {
             productReturnData: product,
         };
-    }, [submitProductData]);
+    }, [editDataExists, submitProductData]);
     const renderInputField = {
         checkbox: (props) => (
             <CheckboxControlled {...props} control={control} />

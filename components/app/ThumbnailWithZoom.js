@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { Button, Modal, Thumbnail } from "@shopify/polaris";
 import NoImage from "../core/NoImage";
 
-export default function ImageExpanding({ alt, src }) {
+export default function ThumbnailWithZoom({ alt, src }) {
     const [showModal, setShowModal] = useState(false);
     const handleShowModal = useCallback(() => setShowModal(!showModal), [
         showModal,

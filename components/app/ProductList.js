@@ -13,7 +13,7 @@ import ProductEditButton from "./ProductEditButton";
 import ProductForm from "./ProductForm";
 import NoImage from "../core/NoImage";
 import TextAlign from "../core/TextAlign";
-import ImageExpanding from "./ImageExpanding";
+import ThumbnailWithZoom from "./ThumbnailWithZoom";
 import useProductList from "../../hooks/useProductList";
 
 export default function ProductList() {
@@ -82,7 +82,7 @@ export default function ProductList() {
                     ) => (
                         <IndexTable.Row id={id} key={id} position={index}>
                             <IndexTable.Cell>
-                                <ImageExpanding
+                                <ThumbnailWithZoom
                                     src={featuredImage?.originalSrc}
                                     alt={featuredImage?.alt}
                                 />
