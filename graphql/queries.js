@@ -8,6 +8,10 @@ export const QUERY_PRODUCT = gql`
                 node {
                     id
                     defaultCursor
+                    featuredImage {
+                        originalSrc
+                    }
+                    handle
                     title
                     variants(first: 1) {
                         edges {
@@ -39,7 +43,7 @@ export const QUERY_PRODUCT = gql`
 `;
 export const QUERY_PRODUCT_APPROVAL = gql`
     query ProductApprovals($cursor: String, $query: String!) {
-        productVariants(first: 20, after: $cursor, query: $query) {
+        productVariants(first: 10, after: $cursor, query: $query) {
             pageInfo {
                 hasNextPage
             }

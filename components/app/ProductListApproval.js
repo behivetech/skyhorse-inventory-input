@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { Banner, IndexTable, Spinner, TextStyle } from "@shopify/polaris";
 import { useQuery } from "@apollo/client";
@@ -8,6 +8,10 @@ import TextAlign from "../core/TextAlign";
 import { QUERY_PRODUCT_APPROVAL } from "../../graphql/queries";
 
 export default function ProductListApproval() {
+    const [productListVariables, setProductListVariables] = useState({
+        cursor: undefined,
+        query: "status:draft",
+    });
     const scrollerParent = useRef(null);
     const {
         data: {
@@ -27,7 +31,7 @@ export default function ProductListApproval() {
     } = useQuery(QUERY_PRODUCT_APPROVAL, {
         variables: {
             cursor: undefined,
-            query: "status:draft",
+            query: "tag:ready",
         },
     });
     const resourceName = {
@@ -41,7 +45,7 @@ export default function ProductListApproval() {
         console.log(productRows, lastProduct.cursor, lastProduct);
         fetchMore({
             variables: {
-                query: "status:draft",
+                query: "tag:ready",
                 cursor: lastProduct.cursor,
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
@@ -67,95 +71,75 @@ export default function ProductListApproval() {
     }
 
     return (
-        <>
-            <div>Product Row Count: {productRows.length}</div>
-
-            <div
-                style={{ height: "30%", overflow: "auto" }}
-                ref={scrollerParent}
+        <div style={{ height: "30%", overflow: "auto" }} ref={scrollerParent}>
+            <InfiniteScroll
+                pageStart={0}
+                loadMore={handleLoadMore}
+                getScrollParent={() => scrollerParent.current}
+                hasMore={hasNextPage}
+                loader={productsLoading && <Spinner key="spinner" />}
+                useWindow={false}
             >
-                <InfiniteScroll
-                    pageStart={0}
-                    loadMore={handleLoadMore}
-                    getScrollParent={() => scrollerParent.current}
-                    hasMore={hasNextPage}
-                    loader={productsLoading && <Spinner key="spinner" />}
-                    useWindow={false}
+                <IndexTable
+                    resourceName={resourceName}
+                    itemCount={productRows.length}
+                    headings={[
+                        { title: "Type/Mine" },
+                        { title: "$/Carat" },
+                        { title: "Price" },
+                    ]}
+                    loading={productsLoading}
+                    selectable={false}
                 >
-                    <IndexTable
-                        resourceName={resourceName}
-                        itemCount={productRows.length}
-                        headings={[
-                            { title: "Type/Mine" },
-                            { title: "Carat" },
-                            { title: "$/Carat" },
-                            { title: "Price" },
-                        ]}
-                        loading={productsLoading}
-                        selectable={false}
-                    >
-                        {productRows.map(
-                            (
-                                {
-                                    node: {
-                                        price,
-                                        product: {
-                                            id,
-                                            carat,
-                                            mine,
-                                            type,
-                                            pricePerCarat,
-                                        },
+                    {productRows.map(
+                        (
+                            {
+                                node: {
+                                    price,
+                                    product: {
+                                        id,
+                                        carat,
+                                        mine,
+                                        type,
+                                        pricePerCarat,
                                     },
                                 },
-                                index
-                            ) => (
-                                <IndexTable.Row
-                                    id={id}
-                                    key={id}
-                                    position={index}
-                                >
-                                    <IndexTable.Cell>
-                                        <p>
-                                            <TextStyle variation="strong">
-                                                {type?.value}
-                                            </TextStyle>
-                                        </p>
-                                        {mine && <p>{mine?.value}</p>}
-                                    </IndexTable.Cell>
-                                    <IndexTable.Cell>
-                                        <TextAlign
-                                            alignment="center"
-                                            padding="0 45% 0 0"
-                                        >
-                                            {carat?.value}ct
-                                        </TextAlign>
-                                    </IndexTable.Cell>
-                                    <IndexTable.Cell>
-                                        <TextAlign
-                                            alignment="right"
-                                            padding="0 45% 0 0"
-                                        >
-                                            $
-                                            {parseFloat(
-                                                pricePerCarat?.value
-                                            ).toFixed(2)}
-                                        </TextAlign>
-                                    </IndexTable.Cell>
-                                    <IndexTable.Cell>
-                                        <TextAlign
-                                            alignment="right"
-                                            padding="0 45% 0 0"
-                                        >
-                                            ${price}
-                                        </TextAlign>
-                                    </IndexTable.Cell>
-                                </IndexTable.Row>
-                            )
-                        )}
-                    </IndexTable>
-                </InfiniteScroll>
-            </div>
-        </>
+                            },
+                            index
+                        ) => (
+                            <IndexTable.Row id={id} key={id} position={index}>
+                                <IndexTable.Cell>
+                                    <p>
+                                        <TextStyle variation="strong">
+                                            {type?.value} - {carat?.value}ct
+                                        </TextStyle>
+                                    </p>
+                                    {mine && <p>{mine?.value}</p>}
+                                </IndexTable.Cell>
+                                <IndexTable.Cell>
+                                    <TextAlign
+                                        alignment="right"
+                                        padding="0 45% 0 0"
+                                    >
+                                        $
+                                        {parseFloat(
+                                            pricePerCarat?.value
+                                        ).toFixed(2)}
+                                    </TextAlign>
+                                </IndexTable.Cell>
+                                <IndexTable.Cell>
+                                    <TextAlign
+                                        alignment="right"
+                                        padding="0 45% 0 0"
+                                    >
+                                        ${price}
+                                    </TextAlign>
+                                </IndexTable.Cell>
+                            </IndexTable.Row>
+                        )
+                    )}
+                </IndexTable>
+            </InfiniteScroll>
+        </div>
     );
 }

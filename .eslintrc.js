@@ -1,6 +1,6 @@
 module.exports = {
     extends: "next/core-web-vitals",
     rules: {
-        indent: ["warning", 4],
+        indent: ["warn", 4],
     },
 };

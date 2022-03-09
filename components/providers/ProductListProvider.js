@@ -34,6 +34,13 @@ function priceFormat(price) {
     return price ? Number.parseFloat(price).toFixed(2) : 0.0;
 }
 
+function getProductLink(id) {
+    const linkArray = [`https://${SHOP}/admin/products/`];
+
+    linkArray.push(id.split("/").slice(-1));
+    return linkArray.join("");
+}
+
 export default function ProductListProvider({ children }) {
     const cursors = useRef([undefined]);
     const [productListVariables, setProductListVariables] = useState({
@@ -59,11 +66,12 @@ export default function ProductListProvider({ children }) {
     });
 
     const productData = productRows.map(
-        ({ node: { id, title, variants, metafields } }) => ({
+        ({ node: { id, featuredImage, title, variants, metafields } }) => ({
             id,
             barcode: getVariant(variants, "barcode"),
             bin: getMetafield(metafields, "bin"),
             carat: getMetafield(metafields, "carat"),
+            featuredImage,
             height: getMetafield(metafields, "height"),
             length: getMetafield(metafields, "length"),
             mine: getMetafield(metafields, "mine"),
@@ -74,6 +82,7 @@ export default function ProductListProvider({ children }) {
             sku: getVariant(variants, "sku"),
             title,
             type: getMetafield(metafields, "type"),
+            url: getProductLink(id),
             width: getMetafield(metafields, "width"),
         })
     );

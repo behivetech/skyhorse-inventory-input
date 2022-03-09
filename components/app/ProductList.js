@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react";
 import {
     Card,
     IndexTable,
+    Link,
     Modal,
     Pagination,
     TextStyle,
@@ -10,7 +11,9 @@ import {
 
 import ProductEditButton from "./ProductEditButton";
 import ProductForm from "./ProductForm";
+import NoImage from "../core/NoImage";
 import TextAlign from "../core/TextAlign";
+import ImageExpanding from "./ImageExpanding";
 import useProductList from "../../hooks/useProductList";
 
 export default function ProductList() {
@@ -52,6 +55,7 @@ export default function ProductList() {
                 resourceName={resourceName}
                 itemCount={productData.length}
                 headings={[
+                    { title: `Count: ${productData.length}` },
                     { title: "Type/Mine/Sku" },
                     { title: "Carat" },
                     { title: "$/Carat" },
@@ -63,14 +67,32 @@ export default function ProductList() {
             >
                 {productData.map(
                     (
-                        { id, type, mine, carat, sku, pricePerCarat, price },
+                        {
+                            id,
+                            featuredImage,
+                            type,
+                            mine,
+                            carat,
+                            sku,
+                            pricePerCarat,
+                            price,
+                            url,
+                        },
                         index
                     ) => (
                         <IndexTable.Row id={id} key={id} position={index}>
                             <IndexTable.Cell>
+                                <ImageExpanding
+                                    src={featuredImage?.originalSrc}
+                                    alt={featuredImage?.alt}
+                                />
+                            </IndexTable.Cell>
+                            <IndexTable.Cell>
                                 <p>
                                     <TextStyle variation="strong">
-                                        {type?.value}
+                                        <Link url={url} external>
+                                            {type?.value}
+                                        </Link>
                                     </TextStyle>
                                 </p>
                                 {mine && <p>{mine?.value}</p>}
