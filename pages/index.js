@@ -10,16 +10,16 @@ import ProductListApproval from "../components/app/ProductListApproval";
 const Index = () => {
     // const {data: metafieldsData, loading: metafieldsLoading, error: metafieldsError} = useQuery(QUERY_METAFIELDS);
     const [showProductCreate, setShowProductCreate] = useState(false);
-    const [showProductApprove, setShowProductApprove] = useState(true);
+    const [productApproveMode, setProductApproveMode] = useState(true);
     const handleProductCreateChange = useCallback(
         () => setShowProductCreate(!showProductCreate),
         [showProductCreate]
     );
     const handleSwitchList = useCallback(
-        () => setShowProductApprove(!showProductApprove),
-        [showProductApprove]
+        () => setProductApproveMode(!productApproveMode),
+        [productApproveMode]
     );
-    const titleBarProps = showProductApprove
+    const titleBarProps = productApproveMode
         ? {
               primaryAction: {
                   content: "Product List",
@@ -46,9 +46,13 @@ const Index = () => {
             <Page divider>
                 <div style={{ paddingBottom: "4rem" }}>
                     <TitleBar {...titleBarProps} />
-                    {showProductApprove && <ProductListApproval />}
-                    {!showProductApprove && <ProductList />}
-                    <Modal open={showProductCreate} title="Create Product">
+                    <ProductList productApprove={productApproveMode} />
+                    <Modal
+                        open={showProductCreate}
+                        title="Create Product"
+                        onClose={handleProductCreateChange}
+                        large
+                    >
                         <Modal.Section>
                             <ProductForm
                                 closeParentModal={handleProductCreateChange}

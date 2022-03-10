@@ -10,12 +10,10 @@ const DEFAULT_CONTEXT = {
         query: "status:draft",
     },
     productsError: null,
-    productsHasNextPage: () => null,
-    productsHasPreviousPage: () => null,
+    productsHasNextPage: false,
     productsLoading: false,
     productData: [],
-    productsHandleOnNext: () => null,
-    productsHandleOnPrevious: () => null,
+    productsHandleLoadMore: () => null,
     priceFormat: () => null,
 };
 
@@ -42,16 +40,14 @@ function getProductLink(id) {
 }
 
 export default function ProductListProvider({ children }) {
-    const cursors = useRef([undefined]);
-    const [productListVariables, setProductListVariables] = useState({
-        cursor: undefined,
-        query: "status:draft",
-    });
+    const [productListVariables, setProductListVariables] = useState(
+        DEFAULT_CONTEXT.productListVariables
+    );
     const {
         data: {
             products: {
                 edges: productRows,
-                pageInfo: { hasNextPage, hasPreviousPage },
+                pageInfo: { hasNextPage },
             },
         } = {
             products: {
@@ -60,6 +56,7 @@ export default function ProductListProvider({ children }) {
             },
         },
         error,
+        fetchMore,
         loading,
     } = useQuery(QUERY_PRODUCT, {
         variables: productListVariables,
@@ -87,36 +84,38 @@ export default function ProductListProvider({ children }) {
         })
     );
 
-    function productsHandleOnNext() {
-        const nextCursor = productRows[productRows.length - 1].cursor;
-        const currentCursors = cursors.current;
+    function productsHandleLoadMore() {
+        const rowLength = productRows.length;
+        const lastProduct = productRows[rowLength - 1] || {};
 
-        if (!currentCursors.includes(nextCursor)) {
-            cursors.current = [...currentCursors, nextCursor];
-        }
+        fetchMore({
+            variables: {
+                ...productListVariables,
+                cursor: lastProduct.cursor,
+            },
+            updateQuery: (previousResult, { fetchMoreResult }) => {
+                const newEdges = fetchMoreResult.products.edges;
+                const pageInfo = fetchMoreResult.products.pageInfo;
 
-        setProductListVariables({
-            ...productListVariables,
-            cursor: nextCursor,
-        });
-    }
-
-    function productsHandleOnPrevious() {
-        const currentCursors = cursors.current;
-        const previousCursorIndex =
-            currentCursors.indexOf(productListVariables.cursor) - 1;
-
-        setProductListVariables({
-            ...productListVariables,
-            cursor: currentCursors[previousCursorIndex],
+                return newEdges.length
+                    ? {
+                          products: {
+                              __typename: previousResult.products.__typename,
+                              edges: [
+                                  ...previousResult.products.edges,
+                                  ...newEdges,
+                              ],
+                              pageInfo,
+                          },
+                      }
+                    : previousResult;
+            },
         });
     }
 
     const context = {
-        productsHandleOnNext,
-        productsHandleOnPrevious,
+        productsHandleLoadMore,
         productsHasNextPage: hasNextPage,
-        productsHasPreviousPage: hasPreviousPage,
         priceFormat,
         productData,
         productListVariables,

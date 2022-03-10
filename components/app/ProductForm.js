@@ -7,6 +7,7 @@ import {
     Checkbox,
     Form,
     FormLayout,
+    Layout,
     Link,
 } from "@shopify/polaris";
 import { useForm } from "react-hook-form";
@@ -250,6 +251,24 @@ export default function ProductForm({
         submitProduct(getProductInputs(formData));
     }
 
+    const metaFieldInputs = Object.keys(formFieldParams).map((key, index) => {
+        const {
+            inputFieldParams: { fieldType, options, placeholder },
+            label,
+            type,
+        } = formFieldParams[key];
+
+        return renderInputField[fieldType]({
+            error: fieldErrors[key]?.message,
+            key: `${fieldType}-field-${key}__${index}`,
+            name: key,
+            label,
+            options,
+            placeholder,
+            type,
+        });
+    });
+
     return (
         <>
             {submitProductError && (
@@ -292,52 +311,34 @@ export default function ProductForm({
             )}
             {!productReturnData && (
                 <Form name="inventory-form" onSubmit={handleSubmit(onSubmit)}>
-                    <Card
-                        title={`${
-                            editDataExists ? "Edit" : "Create"
-                        } Product Form`}
-                    >
-                        <div style={{ padding: "2rem" }}>
+                    <Layout>
+                        <Layout.Section oneHalf>
                             <FormLayout>
+                                {metaFieldInputs.slice(0, 5)}
                                 <Checkbox
                                     label="Stabilized"
                                     checked={stabilized}
                                     onChange={handleChange}
                                 />
-                                {Object.keys(formFieldParams).map(
-                                    (key, index) => {
-                                        const {
-                                            inputFieldParams: {
-                                                fieldType,
-                                                options,
-                                                placeholder,
-                                            },
-                                            label,
-                                            type,
-                                        } = formFieldParams[key];
-
-                                        return renderInputField[fieldType]({
-                                            error: fieldErrors[key]?.message,
-                                            key: `${fieldType}-field-${key}__${index}`,
-                                            name: key,
-                                            label,
-                                            options,
-                                            placeholder,
-                                            type,
-                                        });
-                                    }
-                                )}
-                                <Button
-                                    disabled={submitProductLoading}
-                                    loading={submitProductLoading}
-                                    submit
-                                >
-                                    {editDataExists ? "Update" : "Add"}
-                                </Button>
                             </FormLayout>
-                        </div>
-                        <div style={{ paddingBottom: "6rem" }} />
-                    </Card>
+                        </Layout.Section>
+                        <Layout.Section oneHalf>
+                            <FormLayout>
+                                {metaFieldInputs.slice(
+                                    5 - Math.floor(metaFieldInputs.length)
+                                )}
+                            </FormLayout>
+                        </Layout.Section>
+                        <Layout.Section>
+                            <Button
+                                disabled={submitProductLoading}
+                                loading={submitProductLoading}
+                                submit
+                            >
+                                {editDataExists ? "Update" : "Add"}
+                            </Button>
+                        </Layout.Section>
+                    </Layout>
                 </Form>
             )}
         </>

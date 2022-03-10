@@ -31,44 +31,13 @@ export default function ProductListApproval() {
     } = useQuery(QUERY_PRODUCT_APPROVAL, {
         variables: {
             cursor: undefined,
-            query: "tag:ready",
+            query: "status:draft",
         },
     });
     const resourceName = {
         singular: "Product Approval",
         plural: "Product Approvals",
     };
-
-    function handleLoadMore() {
-        const rowLength = productRows.length;
-        const lastProduct = productRows[rowLength - 1] || {};
-        console.log(productRows, lastProduct.cursor, lastProduct);
-        fetchMore({
-            variables: {
-                query: "tag:ready",
-                cursor: lastProduct.cursor,
-            },
-            updateQuery: (previousResult, { fetchMoreResult }) => {
-                console.log(previousResult, fetchMoreResult);
-                const newEdges = fetchMoreResult.productVariants.edges;
-                const pageInfo = fetchMoreResult.productVariants.pageInfo;
-
-                return newEdges.length
-                    ? {
-                          productVariants: {
-                              __typename:
-                                  previousResult.productVariants.__typename,
-                              edges: [
-                                  ...previousResult.productVariants.edges,
-                                  ...newEdges,
-                              ],
-                              pageInfo,
-                          },
-                      }
-                    : previousResult;
-            },
-        });
-    }
 
     return (
         <div style={{ height: "30%", overflow: "auto" }} ref={scrollerParent}>

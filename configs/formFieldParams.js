@@ -1,22 +1,6 @@
 import * as yup from "yup";
 
 const formFieldParams = {
-    bin: {
-        label: "Bin",
-        type: "number",
-        validation: yup.number().positive().required(),
-        inputFieldParams: {
-            fieldType: "text",
-        },
-    },
-    otherLocation: {
-        label: "Other Location",
-        type: "text",
-        validation: yup.string(),
-        inputFieldParams: {
-            fieldType: "text",
-        },
-    },
     type: {
         label: "Type",
         type: "text",
@@ -119,6 +103,22 @@ const formFieldParams = {
         label: "Price Approved",
         inputFieldParams: {
             fieldType: "checkbox",
+        },
+    },
+    bin: {
+        label: "Bin",
+        type: "number",
+        validation: yup.number().positive().required(),
+        inputFieldParams: {
+            fieldType: "text",
+        },
+    },
+    otherLocation: {
+        label: "Other Location",
+        type: "text",
+        validation: yup.string(),
+        inputFieldParams: {
+            fieldType: "text",
         },
     },
     length: {

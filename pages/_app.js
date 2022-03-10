@@ -16,7 +16,7 @@ function userLoggedInFetch(app) {
 
     return async (uri, options) => {
         const response = await fetchFunction(uri, options);
-        console.log(uri);
+
         if (
             response.headers.get(
                 "X-Shopify-API-Request-Failure-Reauthorize"
