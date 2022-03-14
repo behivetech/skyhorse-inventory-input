@@ -1,6 +1,22 @@
 import * as yup from "yup";
 
 const formFieldParams = {
+    pricePerCarat: {
+        label: "Price Per Carat",
+        type: "number",
+        validation: yup.number().positive().required(),
+        inputFieldParams: {
+            fieldType: "text",
+        },
+    },
+    carat: {
+        label: "Carat",
+        type: "number",
+        validation: yup.number().positive().required(),
+        inputFieldParams: {
+            fieldType: "text",
+        },
+    },
     type: {
         label: "Type",
         type: "text",
@@ -82,29 +98,13 @@ const formFieldParams = {
             ],
         },
     },
-    carat: {
-        label: "Carat",
-        type: "number",
-        validation: yup.number().positive().required(),
-        inputFieldParams: {
-            fieldType: "text",
-        },
-    },
-    pricePerCarat: {
-        label: "Price Per Carat",
-        type: "number",
-        validation: yup.number().positive().required(),
-        inputFieldParams: {
-            fieldType: "text",
-        },
-    },
-    priceApproved: {
-        type: "boolean",
-        label: "Price Approved",
-        inputFieldParams: {
-            fieldType: "checkbox",
-        },
-    },
+    // priceApproved: {
+    //     type: "boolean",
+    //     label: "Price Approved",
+    //     inputFieldParams: {
+    //         fieldType: "checkbox",
+    //     },
+    // },
     bin: {
         label: "Bin",
         type: "number",

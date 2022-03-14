@@ -51,6 +51,7 @@
     "react-hook-form": "^7.27.1",
     "react-infinite-scroller": "^1.2.5",
     "react-scroll": "^1.8.6",
+    "sass": "^1.49.9",
     "store-js": "^2.0.4",
     "webpack": "^5.69.1",
     "yup": "^0.32.11"

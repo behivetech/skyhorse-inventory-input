@@ -1,9 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useMutation } from "@apollo/client";
 import {
     Banner,
     Button,
-    Card,
     Checkbox,
     Form,
     FormLayout,
@@ -19,18 +17,18 @@ import formFieldParams from "../../configs/formFieldParams";
 import CheckboxControlled from "../core/CheckboxControlled";
 import SelectControlled from "../core/SelectControlled";
 import TextFieldControlled from "../core/TextFieldControlled";
-import useProductList from "../../hooks/useProductList";
-
-import { ADD_PRODUCT, UPDATE_PRODUCT } from "../../graphql/mutations";
-import { QUERY_PRODUCT } from "../../graphql/queries";
+import useProducts from "../../hooks/useProducts";
+import getClassName from "../../tools/getClassName";
+import styles from "./ProductForm.module.scss";
 
 const schema = yup.object(mapValues(formFieldParams, "validation")).required();
 
 export default function ProductForm({
-    editData = {},
+    className,
     closeParentModal = () => null,
+    editData = {},
 }) {
-    const { editDataExists, defaultValues, gqlMutation } = useMemo(() => {
+    const { editDataExists, defaultValues } = useMemo(() => {
         const defaultValues = {};
         const editDataExists = !!editData.id;
         let editValue = null;
@@ -38,7 +36,6 @@ export default function ProductForm({
         for (let valueKey in editData) {
             editValue = editData[valueKey];
 
-            console.log(editValue?.value);
             if (editValue || editValue?.value) {
                 if (["False", "false"].includes(editValue?.value)) {
                     editValue = false;
@@ -54,7 +51,6 @@ export default function ProductForm({
         return {
             defaultValues,
             editDataExists,
-            gqlMutation: editDataExists ? UPDATE_PRODUCT : ADD_PRODUCT,
         };
     }, [editData]);
     const [stabilized, setStabilized] = useState(
@@ -73,31 +69,53 @@ export default function ProductForm({
         (newChecked) => setStabilized(newChecked),
         []
     );
-    const { productListVariables } = useProductList();
-    const [
-        submitProduct,
-        {
-            data: submitProductData,
-            error: submitProductError,
-            loading: submitProductLoading,
-            reset: resetMutation,
-        },
-    ] = useMutation(gqlMutation, {
-        refetchQueries: [
-            { query: QUERY_PRODUCT, variables: productListVariables },
-        ],
-        awaitRefetchQueries: true,
-    });
-    const { productReturnData } = useMemo(() => {
-        const productKey = editDataExists ? "productUpdate" : "productCreate";
-        const { product } = submitProductData
-            ? submitProductData[productKey]
-            : {};
-
-        return {
-            productReturnData: product,
-        };
-    }, [editDataExists, submitProductData]);
+    const {
+        productCreate,
+        productCreateData,
+        productCreateError,
+        productCreateLoading,
+        productCreateReset,
+        productUpdate,
+        productUpdateData,
+        productUpdateError,
+        productUpdateLoading,
+        productUpdateReset,
+    } = useProducts();
+    const {
+        productSubmit,
+        productSubmitData,
+        productSubmitError,
+        productSubmitLoading,
+        productSubmitReset,
+    } = useMemo(() => {
+        return editDataExists
+            ? {
+                  productSubmit: productUpdate,
+                  productSubmitData: productUpdateData,
+                  productSubmitError: productUpdateError,
+                  productSubmitLoading: productUpdateLoading,
+                  productSubmitReset: productUpdateReset,
+              }
+            : {
+                  productSubmit: productCreate,
+                  productSubmitData: productCreateData,
+                  productSubmitError: productCreateError,
+                  productSubmitLoading: productCreateLoading,
+                  productSubmitReset: productCreateReset,
+              };
+    }, [
+        editDataExists,
+        productCreate,
+        productCreateData,
+        productCreateError,
+        productCreateLoading,
+        productCreateReset,
+        productUpdate,
+        productUpdateData,
+        productUpdateError,
+        productUpdateLoading,
+        productUpdateReset,
+    ]);
     const renderInputField = {
         checkbox: (props) => (
             <CheckboxControlled {...props} control={control} />
@@ -233,8 +251,8 @@ export default function ProductForm({
         };
         const linkArray = [`https://${SHOP}`, linkTypes[linkType]];
 
-        if (productReturnData?.id) {
-            linkArray.push(productReturnData?.id.split("/").slice(-1));
+        if (productSubmitData?.id) {
+            linkArray.push(productSubmitData?.id.split("/").slice(-1));
         }
 
         return linkArray.join("");
@@ -242,13 +260,13 @@ export default function ProductForm({
 
     function handleSuccessBannerDismiss() {
         resetForm();
-        resetMutation();
+        productSubmitReset();
         closeParentModal();
     }
 
     function onSubmit(formData) {
         console.log(getProductInputs(formData));
-        submitProduct(getProductInputs(formData));
+        productSubmit(getProductInputs(formData));
     }
 
     const metaFieldInputs = Object.keys(formFieldParams).map((key, index) => {
@@ -269,14 +287,23 @@ export default function ProductForm({
         });
     });
 
+    const [rootClassName, getChildClass] = getClassName({
+        className,
+        rootClass: "product-form",
+        styles,
+    });
+
     return (
-        <>
-            {submitProductError && (
-                <Banner status="critical" onDismiss={() => resetMutation()}>
-                    {submitProductError?.message}
+        <div className={rootClassName}>
+            {productSubmitError && (
+                <Banner
+                    status="critical"
+                    onDismiss={() => productSubmitReset()}
+                >
+                    {productSubmitError?.message}
                 </Banner>
             )}
-            {productReturnData && (
+            {productSubmitData && (
                 <Banner
                     status="success"
                     title={`Product Successfully ${
@@ -291,7 +318,7 @@ export default function ProductForm({
                             ? undefined
                             : {
                                   content: "Add Similar Item",
-                                  onAction: () => resetMutation(),
+                                  onAction: () => productSubmitReset(),
                               }
                     }
                     onDismiss={handleSuccessBannerDismiss}
@@ -299,48 +326,58 @@ export default function ProductForm({
                     <p>
                         Product Page:{" "}
                         <Link url={getLink("productPage")} external>
-                            {productReturnData?.title}
+                            {productSubmitData?.title}
                         </Link>
                         <br />
                         <Link url={getLink("barcode")} external>
                             Print Barcode
                         </Link>{" "}
-                        {productReturnData?.variants.edges[0].node.barcode}
+                        {productSubmitData?.variants?.edges[0].node.barcode}
                     </p>
                 </Banner>
             )}
-            {!productReturnData && (
+            {!productSubmitData && (
                 <Form name="inventory-form" onSubmit={handleSubmit(onSubmit)}>
-                    <Layout>
-                        <Layout.Section oneHalf>
+                    <div className={getChildClass("layout")}>
+                        <section className={getChildClass("section-half")}>
+                            <Checkbox
+                                label="Stabilized"
+                                checked={stabilized}
+                                onChange={handleChange}
+                            />
+                        </section>
+                        <section className={getChildClass("section-half")}>
+                            <CheckboxControlled
+                                control={control}
+                                label="Price Approved"
+                                name="priceApproved"
+                            />
+                        </section>
+                        <section className={getChildClass("section-half")}>
                             <FormLayout>
                                 {metaFieldInputs.slice(0, 5)}
-                                <Checkbox
-                                    label="Stabilized"
-                                    checked={stabilized}
-                                    onChange={handleChange}
-                                />
                             </FormLayout>
-                        </Layout.Section>
-                        <Layout.Section oneHalf>
+                        </section>
+                        <section className={getChildClass("section-half")}>
                             <FormLayout>
                                 {metaFieldInputs.slice(
                                     5 - Math.floor(metaFieldInputs.length)
                                 )}
                             </FormLayout>
-                        </Layout.Section>
-                        <Layout.Section>
+                        </section>
+                        <section className={getChildClass("section")}>
                             <Button
-                                disabled={submitProductLoading}
-                                loading={submitProductLoading}
+                                disabled={productSubmitLoading}
+                                loading={productSubmitLoading}
+                                primary
                                 submit
                             >
                                 {editDataExists ? "Update" : "Add"}
                             </Button>
-                        </Layout.Section>
-                    </Layout>
+                        </section>
+                    </div>
                 </Form>
             )}
-        </>
+        </div>
     );
 }

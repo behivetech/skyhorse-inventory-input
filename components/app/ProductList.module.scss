@@ -1,0 +1,12 @@
+.product-list {
+
+    &__scroll-container {
+         max-height: 28rem;
+         overflow: auto;
+    }
+
+    &__actions {
+        display: inline-block;
+        padding: 0 0.5rem;
+    }
+}

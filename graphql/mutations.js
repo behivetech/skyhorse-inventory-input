@@ -1,47 +1,32 @@
 import { gql } from "@apollo/client";
+import { CORE_PRODUCT_FIELDS } from "./fragments";
 
 export const ADD_PRODUCT = gql`
-  mutation productCreate($input: ProductInput!) {
-    productCreate(input: $input) {
-      product {
-        id
-        title
-        vendor
-        variants(first: 1) {
-          edges {
-            node {
-              barcode
+    ${CORE_PRODUCT_FIELDS}
+    mutation productCreate($input: ProductInput!) {
+        productCreate(input: $input) {
+            product {
+                ...CoreProductFields
             }
-          }
+            userErrors {
+                field
+                message
+            }
         }
-      }
-      userErrors {
-        field
-        message
-      }
     }
-  }
 `;
 
 export const UPDATE_PRODUCT = gql`
-  mutation productUpdate($input: ProductInput!) {
-    productUpdate(input: $input) {
-      product {
-        id
-        title
-        vendor
-        variants(first: 1) {
-          edges {
-            node {
-              barcode
+    ${CORE_PRODUCT_FIELDS}
+    mutation productUpdate($input: ProductInput!) {
+        productUpdate(input: $input) {
+            product {
+                ...CoreProductFields
             }
-          }
+            userErrors {
+                field
+                message
+            }
         }
-      }
-      userErrors {
-        field
-        message
-      }
     }
-  }
 `;

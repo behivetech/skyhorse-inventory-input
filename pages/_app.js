@@ -11,6 +11,8 @@ import { Redirect } from "@shopify/app-bridge/actions";
 import "@shopify/polaris/build/esm/styles.css";
 import translations from "@shopify/polaris/locales/en.json";
 
+import ProductsProvider from "../components/providers/ProductsProvider";
+
 function userLoggedInFetch(app) {
     const fetchFunction = authenticatedFetch(app);
 
@@ -38,7 +40,17 @@ function userLoggedInFetch(app) {
 function MyProvider(props) {
     const app = useAppBridge();
     const client = new ApolloClient({
-        cache: new InMemoryCache(),
+        cache: new InMemoryCache({
+            typePolicies: {
+                Products: {
+                    fields: {
+                        products: {
+                            keyArgs: ["query"],
+                        },
+                    },
+                },
+            },
+        }),
         fetch: userLoggedInFetch(app),
         fetchOptions: {
             credentials: "include",
@@ -49,7 +61,9 @@ function MyProvider(props) {
 
     return (
         <ApolloProvider client={client}>
-            <Component {...props} />
+            <ProductsProvider>
+                <Component {...props} />
+            </ProductsProvider>
         </ApolloProvider>
     );
 }

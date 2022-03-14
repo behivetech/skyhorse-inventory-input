@@ -1,0 +1,20 @@
+.product-form {
+
+    &__layout {
+        align-items: stretch;
+        display: flex;
+        gap: 1rem 2rem;
+        flex-wrap: wrap;
+        padding: 2rem;
+    }
+
+
+    &__section {
+        min-width: 100%;
+    }
+
+    &__section-half {
+        flex: 1 0 0;
+        min-width: 20rem;
+    }
+}

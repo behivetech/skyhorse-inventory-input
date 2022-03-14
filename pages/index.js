@@ -1,11 +1,10 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Modal, Page } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 
 import ProductForm from "../components/app/ProductForm";
 import ProductList from "../components/app/ProductList";
-import ProductListProvider from "../components/providers/ProductListProvider";
-import ProductListApproval from "../components/app/ProductListApproval";
+import useProducts from "../hooks/useProducts";
 
 const Index = () => {
     // const {data: metafieldsData, loading: metafieldsLoading, error: metafieldsError} = useQuery(QUERY_METAFIELDS);
@@ -15,14 +14,14 @@ const Index = () => {
         () => setShowProductCreate(!showProductCreate),
         [showProductCreate]
     );
-    const handleSwitchList = useCallback(
-        () => setProductApproveMode(!productApproveMode),
-        [productApproveMode]
-    );
+    const handleSwitchList = useCallback(() => {
+        setProductApproveMode(!productApproveMode);
+    }, [productApproveMode]);
+
     const titleBarProps = productApproveMode
         ? {
               primaryAction: {
-                  content: "Product List",
+                  content: "Add / Edit Products",
                   onAction: handleSwitchList,
               },
               title: "Approve Products",
@@ -42,26 +41,27 @@ const Index = () => {
           };
 
     return (
-        <ProductListProvider>
-            <Page divider>
-                <div style={{ paddingBottom: "4rem" }}>
-                    <TitleBar {...titleBarProps} />
-                    <ProductList productApprove={productApproveMode} />
-                    <Modal
-                        open={showProductCreate}
-                        title="Create Product"
-                        onClose={handleProductCreateChange}
-                        large
-                    >
-                        <Modal.Section>
-                            <ProductForm
-                                closeParentModal={handleProductCreateChange}
-                            />
-                        </Modal.Section>
-                    </Modal>
-                </div>
-            </Page>
-        </ProductListProvider>
+        <Page divider>
+            <div style={{ paddingBottom: "4rem" }}>
+                <TitleBar {...titleBarProps} />
+                <ProductList
+                    productApprove={productApproveMode}
+                    key={`productApprove__${productApproveMode}`}
+                />
+                <Modal
+                    open={showProductCreate}
+                    title="Create Product"
+                    onClose={handleProductCreateChange}
+                    large
+                >
+                    <Modal.Section>
+                        <ProductForm
+                            closeParentModal={handleProductCreateChange}
+                        />
+                    </Modal.Section>
+                </Modal>
+            </div>
+        </Page>
     );
 };
 
