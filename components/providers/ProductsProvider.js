@@ -55,15 +55,6 @@ export default function ProductsProvider({ children }) {
     //                 query: QUERY_PRODUCT,
     //                 variables: productListVariables,
     //             });
-
-    //             console.log({
-    //                 newProductFromResponse,
-    //                 existingProducts,
-    //                 oldProduct: existingProducts?.products?.edges.find(({ node }) => newProductFromResponse.id === node.id),
-    //                 newProduct: {
-    //                     ...existingProducts?.products?.edges.find(({ node }) => newProductFromResponse.id === node.id),
-    //                     node: newProductFromResponse,
-    //                 }
     //             })
     //             // if (newProductFromResponse) {
     //             //     const newProductRecord = {
@@ -140,7 +131,6 @@ export default function ProductsProvider({ children }) {
                 const newEdges = fetchMoreResult.products.edges;
                 const pageInfo = fetchMoreResult.products.pageInfo;
 
-                console.log({ rest });
                 return newEdges.length
                     ? {
                           products: {

@@ -60,8 +60,8 @@ export default function ProductForm({
         return {
             defaultValues,
             editDataExists,
-            hasReady: editData.tags.includes("ready"),
-            hasPublish: editData.tags.includes("publishable"),
+            hasReady: editData.tags?.includes("ready"),
+            hasPublish: editData.tags?.includes("publishable"),
         };
     }, [editData]);
     const [stabilized, setStabilized] = useState(
@@ -195,7 +195,6 @@ export default function ProductForm({
         return combinedTags;
     }
 
-    console.log(getVariant(editData?.variants, "barcode"));
     function getProductInputs(formData) {
         const { pricePerCarat, type, mine, carat, bin } = formData || {};
         const tags = getTags([type, mine]);

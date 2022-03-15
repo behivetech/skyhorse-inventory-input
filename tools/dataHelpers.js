@@ -19,7 +19,6 @@ function buildUrl(id, path) {
 }
 
 export function getProductLink(id) {
-    console.log("product link", buildUrl(id, "/admin/products/"), id);
     return buildUrl(id, "/admin/products/");
 }
 

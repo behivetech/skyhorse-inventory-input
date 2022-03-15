@@ -85,7 +85,7 @@ export default function ProductList({ productApprove }) {
     };
     const productsData = useMemo(() => {
         let filteredData = productApprove
-            ? products.filter(({ node: { tags } }) => tags?.includes("ready"))
+            ? products.filter(({ node: { tags } }) => tags?.includes(" q"))
             : products.filter(({ node: { tags } }) => !tags?.includes("ready"));
 
         if (barcodeFilter) {
