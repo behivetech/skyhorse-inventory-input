@@ -119,44 +119,38 @@ export default function ProductsProvider({ children }) {
         },
     ] = useMutation(UPDATE_PRODUCT); //, mutationOptions);
 
-    function productsHandleLoadMore() {
+    const productsHandleLoadMore = debounce(() => {
         const rowLength = productRows.length;
         const lastProduct = productRows[rowLength - 1] || {};
         const fetchVariables = {
             ...productListVariables,
             cursor: lastProduct.cursor,
         };
-        const fetchMoreDebounced = debounce(() => {
-            if (rowLength > TOTAL_QUERY_ROWS - 1) {
-                fetchMore({
-                    variables: fetchVariables,
-                    updateQuery: (
-                        previousResult,
-                        { fetchMoreResult, ...rest }
-                    ) => {
-                        const newEdges = fetchMoreResult.products.edges;
-                        const pageInfo = fetchMoreResult.products.pageInfo;
 
-                        return newEdges.length
-                            ? {
-                                  products: {
-                                      __typename:
-                                          previousResult.products.__typename,
-                                      edges: [
-                                          ...previousResult.products.edges,
-                                          ...newEdges,
-                                      ],
-                                      pageInfo,
-                                  },
-                              }
-                            : previousResult;
-                    },
-                });
-            }
-        }, 1500);
+        if (rowLength > TOTAL_QUERY_ROWS - 1) {
+            fetchMore({
+                variables: fetchVariables,
+                updateQuery: (previousResult, { fetchMoreResult, ...rest }) => {
+                    const newEdges = fetchMoreResult.products.edges;
+                    const pageInfo = fetchMoreResult.products.pageInfo;
 
-        return fetchMoreDebounced;
-    }
+                    return newEdges.length
+                        ? {
+                              products: {
+                                  __typename:
+                                      previousResult.products.__typename,
+                                  edges: [
+                                      ...previousResult.products.edges,
+                                      ...newEdges,
+                                  ],
+                                  pageInfo,
+                              },
+                          }
+                        : previousResult;
+                },
+            });
+        }
+    }, 1200);
 
     const context = {
         products: productRows,

@@ -104,14 +104,10 @@ export default function ProductList({ productApprove }) {
     }, [barcodeFilter, productsLoading, products, skuFilter]);
 
     const hasMore = useMemo(() => {
-        return (
-            !productsLoading &&
-            !productsData?.length &&
-            products?.length &&
-            productsHasNextPage
-        );
+        return !productsLoading && productsHasNextPage;
     }, [productsLoading, productsData, products, productsHasNextPage]);
 
+    console.log(hasMore);
     function handleEditClick(productId) {
         setEditData(findProduct(productsData, productId));
         setShowEditModal(true);
