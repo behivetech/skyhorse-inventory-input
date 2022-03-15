@@ -85,7 +85,7 @@ export default function ProductList({ productApprove }) {
     };
     const productsData = useMemo(() => {
         let filteredData = productApprove
-            ? products.filter(({ node: { tags } }) => tags?.includes(" q"))
+            ? products.filter(({ node: { tags } }) => tags?.includes("ready"))
             : products.filter(({ node: { tags } }) => !tags?.includes("ready"));
 
         if (barcodeFilter) {
@@ -209,8 +209,9 @@ export default function ProductList({ productApprove }) {
                         pageStart={0}
                         loadMore={productsHandleLoadMore}
                         getScrollParent={() => scrollerParent.current}
-                        hasMore={productsHasNextPage}
+                        hasMore={productsHasNextPage && productsData.length}
                         loader={productsLoading && <Spinner key="spinner" />}
+                        threshold={1800}
                         useWindow={false}
                     >
                         <IndexTable

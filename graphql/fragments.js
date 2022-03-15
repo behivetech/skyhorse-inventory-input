@@ -3,11 +3,9 @@ import { gql } from "@apollo/client";
 export const CORE_PRODUCT_FIELDS = gql`
     fragment CoreProductFields on Product {
         id
-        defaultCursor
         featuredImage {
             originalSrc
         }
-        handle
         title
         tags
         variants(first: 1) {

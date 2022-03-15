@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { QUERY_PRODUCT } from "../../graphql/queries";
 import { ADD_PRODUCT, UPDATE_PRODUCT } from "../../graphql/mutations";
 
+const TOTAL_QUERY_ROWS = 20;
 const DEFAULT_CONTEXT = {
     cursors: [],
     // getProducts: () => [],
@@ -25,8 +26,8 @@ const DEFAULT_CONTEXT = {
     productsHandleLoadMore: () => null,
     productListVariables: {
         cursor: undefined,
-        first: 20,
-        query: "status:draft",
+        first: TOTAL_QUERY_ROWS,
+        query: "status:draft tag:ready",
         reverse: true,
         sortKey: "UPDATED_AT",
     },
@@ -125,26 +126,29 @@ export default function ProductsProvider({ children }) {
             cursor: lastProduct.cursor,
         };
 
-        fetchMore({
-            variables: fetchVariables,
-            updateQuery: (previousResult, { fetchMoreResult, ...rest }) => {
-                const newEdges = fetchMoreResult.products.edges;
-                const pageInfo = fetchMoreResult.products.pageInfo;
+        if (rowLength > TOTAL_QUERY_ROWS - 1) {
+            fetchMore({
+                variables: fetchVariables,
+                updateQuery: (previousResult, { fetchMoreResult, ...rest }) => {
+                    const newEdges = fetchMoreResult.products.edges;
+                    const pageInfo = fetchMoreResult.products.pageInfo;
 
-                return newEdges.length
-                    ? {
-                          products: {
-                              __typename: previousResult.products.__typename,
-                              edges: [
-                                  ...previousResult.products.edges,
-                                  ...newEdges,
-                              ],
-                              pageInfo,
-                          },
-                      }
-                    : previousResult;
-            },
-        });
+                    return newEdges.length
+                        ? {
+                              products: {
+                                  __typename:
+                                      previousResult.products.__typename,
+                                  edges: [
+                                      ...previousResult.products.edges,
+                                      ...newEdges,
+                                  ],
+                                  pageInfo,
+                              },
+                          }
+                        : previousResult;
+                },
+            });
+        }
     }
 
     const context = {
