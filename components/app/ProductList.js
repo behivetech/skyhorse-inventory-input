@@ -103,6 +103,15 @@ export default function ProductList({ productApprove }) {
         return filteredData;
     }, [barcodeFilter, productsLoading, products, skuFilter]);
 
+    const hasMore = useMemo(() => {
+        return (
+            !productsLoading &&
+            !productsData?.length &&
+            products?.length &&
+            productsHasNextPage
+        );
+    }, [productsLoading, productsData, products, productsHasNextPage]);
+
     function handleEditClick(productId) {
         setEditData(findProduct(productsData, productId));
         setShowEditModal(true);
@@ -209,7 +218,7 @@ export default function ProductList({ productApprove }) {
                         pageStart={0}
                         loadMore={productsHandleLoadMore}
                         getScrollParent={() => scrollerParent.current}
-                        hasMore={productsHasNextPage && productsData.length}
+                        hasMore={hasMore}
                         loader={productsLoading && <Spinner key="spinner" />}
                         threshold={1800}
                         useWindow={false}

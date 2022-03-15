@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useMemo, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
+import debounce from "lodash.debounce";
 
 import { QUERY_PRODUCT } from "../../graphql/queries";
 import { ADD_PRODUCT, UPDATE_PRODUCT } from "../../graphql/mutations";
@@ -27,7 +28,7 @@ const DEFAULT_CONTEXT = {
     productListVariables: {
         cursor: undefined,
         first: TOTAL_QUERY_ROWS,
-        query: "status:draft tag:ready",
+        query: "status:draft",
         reverse: true,
         sortKey: "UPDATED_AT",
     },
@@ -125,30 +126,36 @@ export default function ProductsProvider({ children }) {
             ...productListVariables,
             cursor: lastProduct.cursor,
         };
+        const fetchMoreDebounced = debounce(() => {
+            if (rowLength > TOTAL_QUERY_ROWS - 1) {
+                fetchMore({
+                    variables: fetchVariables,
+                    updateQuery: (
+                        previousResult,
+                        { fetchMoreResult, ...rest }
+                    ) => {
+                        const newEdges = fetchMoreResult.products.edges;
+                        const pageInfo = fetchMoreResult.products.pageInfo;
 
-        if (rowLength > TOTAL_QUERY_ROWS - 1) {
-            fetchMore({
-                variables: fetchVariables,
-                updateQuery: (previousResult, { fetchMoreResult, ...rest }) => {
-                    const newEdges = fetchMoreResult.products.edges;
-                    const pageInfo = fetchMoreResult.products.pageInfo;
+                        return newEdges.length
+                            ? {
+                                  products: {
+                                      __typename:
+                                          previousResult.products.__typename,
+                                      edges: [
+                                          ...previousResult.products.edges,
+                                          ...newEdges,
+                                      ],
+                                      pageInfo,
+                                  },
+                              }
+                            : previousResult;
+                    },
+                });
+            }
+        }, 1500);
 
-                    return newEdges.length
-                        ? {
-                              products: {
-                                  __typename:
-                                      previousResult.products.__typename,
-                                  edges: [
-                                      ...previousResult.products.edges,
-                                      ...newEdges,
-                                  ],
-                                  pageInfo,
-                              },
-                          }
-                        : previousResult;
-                },
-            });
-        }
+        return fetchMoreDebounced;
     }
 
     const context = {
