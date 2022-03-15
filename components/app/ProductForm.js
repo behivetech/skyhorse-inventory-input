@@ -5,7 +5,6 @@ import {
     Checkbox,
     Form,
     FormLayout,
-    Layout,
     Link,
 } from "@shopify/polaris";
 import { useForm } from "react-hook-form";
@@ -20,6 +19,11 @@ import TextFieldControlled from "../core/TextFieldControlled";
 import useProducts from "../../hooks/useProducts";
 import getClassName from "../../tools/getClassName";
 import styles from "./ProductForm.module.scss";
+import {
+    getBarcodeLink,
+    getProductLink,
+    getVariant,
+} from "../../tools/dataHelpers";
 
 const schema = yup.object(mapValues(formFieldParams, "validation")).required();
 
@@ -244,20 +248,6 @@ export default function ProductForm({
         return payload;
     }
 
-    function getLink(linkType) {
-        const linkTypes = {
-            barcode: "/admin/apps/retail-labels-printer/print/preview?id=",
-            productPage: "/admin/products/",
-        };
-        const linkArray = [`https://${SHOP}`, linkTypes[linkType]];
-
-        if (productSubmitData?.id) {
-            linkArray.push(productSubmitData?.id.split("/").slice(-1));
-        }
-
-        return linkArray.join("");
-    }
-
     function handleSuccessBannerDismiss() {
         resetForm();
         productSubmitReset();
@@ -265,7 +255,7 @@ export default function ProductForm({
     }
 
     function onSubmit(formData) {
-        console.log(getProductInputs(formData));
+        // console.log(getProductInputs(formData));
         productSubmit(getProductInputs(formData));
     }
 
@@ -325,34 +315,41 @@ export default function ProductForm({
                 >
                     <p>
                         Product Page:{" "}
-                        <Link url={getLink("productPage")} external>
+                        <Link
+                            url={getProductLink(productSubmitData?.id)}
+                            external
+                        >
                             {productSubmitData?.title}
                         </Link>
                         <br />
-                        <Link url={getLink("barcode")} external>
+                        <Link
+                            url={getBarcodeLink(productSubmitData?.id)}
+                            external
+                        >
                             Print Barcode
                         </Link>{" "}
-                        {productSubmitData?.variants?.edges[0].node.barcode}
+                        {getVariant(productSubmitData?.variants, "barcode")}
                     </p>
                 </Banner>
             )}
             {!productSubmitData && (
                 <Form name="inventory-form" onSubmit={handleSubmit(onSubmit)}>
+                    <div className={getChildClass("upper-form")}>
+                        <Button
+                            disabled={productSubmitLoading}
+                            loading={productSubmitLoading}
+                            primary
+                            submit
+                        >
+                            {editDataExists ? "Update" : "Add"}
+                        </Button>
+                        <Checkbox
+                            label="Stabilized"
+                            checked={stabilized}
+                            onChange={handleChange}
+                        />
+                    </div>
                     <div className={getChildClass("layout")}>
-                        <section className={getChildClass("section-half")}>
-                            <Checkbox
-                                label="Stabilized"
-                                checked={stabilized}
-                                onChange={handleChange}
-                            />
-                        </section>
-                        <section className={getChildClass("section-half")}>
-                            <CheckboxControlled
-                                control={control}
-                                label="Price Approved"
-                                name="priceApproved"
-                            />
-                        </section>
                         <section className={getChildClass("section-half")}>
                             <FormLayout>
                                 {metaFieldInputs.slice(0, 5)}
@@ -364,16 +361,6 @@ export default function ProductForm({
                                     5 - Math.floor(metaFieldInputs.length)
                                 )}
                             </FormLayout>
-                        </section>
-                        <section className={getChildClass("section")}>
-                            <Button
-                                disabled={productSubmitLoading}
-                                loading={productSubmitLoading}
-                                primary
-                                submit
-                            >
-                                {editDataExists ? "Update" : "Add"}
-                            </Button>
                         </section>
                     </div>
                 </Form>

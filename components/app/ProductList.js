@@ -2,15 +2,18 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import {
     Card,
+    Filters,
+    Heading,
     IndexTable,
     Link,
     Modal,
     Spinner,
+    TextField,
     TextStyle,
 } from "@shopify/polaris";
 
 import getClassName from "../../tools/getClassName";
-import { getVariant, priceFormat } from "../../tools/dataHelpers";
+import { getProductId, getVariant, priceFormat } from "../../tools/dataHelpers";
 import ProductForm from "./ProductForm";
 import styles from "./ProductList.module.scss";
 import TextAlign from "../core/TextAlign";
@@ -23,8 +26,46 @@ function findProduct(products, productId) {
     return products.find(({ node: { id } }) => id === productId)?.node;
 }
 
+function disambiguateLabel(key, value) {
+    const labels = {
+        skuFilter: `SKU: ${value}`,
+        barcodeFilter: `Barcode: ${value}`,
+    };
+
+    return labels[key];
+}
+
 export default function ProductList({ productApprove }) {
     const scrollerParent = useRef(null);
+    const [barcodeFilter, setBarcodeFilter] = useState(null);
+    const [skuFilter, setSkuFilter] = useState(null);
+    const handleBarcodeRemove = useCallback(() => setBarcodeFilter(null), []);
+    const handleSkuRemove = useCallback(() => setSkuFilter(null), []);
+    const handleClearAll = useCallback(() => {
+        handleBarcodeRemove();
+        handleSkuRemove();
+    }, [handleBarcodeRemove, handleSkuRemove]);
+    const appliedFilters = useMemo(() => {
+        const currentFilters = [];
+
+        if (barcodeFilter) {
+            currentFilters.push({
+                key: "barcodeFilter",
+                label: disambiguateLabel("barcodeFilter", barcodeFilter),
+                onRemove: handleBarcodeRemove,
+            });
+        }
+
+        if (skuFilter) {
+            currentFilters.push({
+                key: "skuFilter",
+                label: disambiguateLabel("skuFilter", skuFilter),
+                onRemove: handleSkuRemove,
+            });
+        }
+
+        return currentFilters;
+    }, [skuFilter, barcodeFilter]);
     const {
         products,
         productsLoading,
@@ -44,10 +85,24 @@ export default function ProductList({ productApprove }) {
         plural: "products",
     };
     const productsData = useMemo(() => {
-        return productApprove
+        let filteredData = productApprove
             ? products.filter(({ node: { tags } }) => tags?.includes("ready"))
             : products.filter(({ node: { tags } }) => !tags?.includes("ready"));
-    }, [productsLoading, products]);
+
+        if (barcodeFilter) {
+            filteredData = filteredData.filter(({ node: { variants } }) =>
+                getVariant(variants, "barcode").includes(barcodeFilter)
+            );
+        }
+
+        if (skuFilter) {
+            filteredData = filteredData.filter(({ node: { variants } }) =>
+                getVariant(variants, "sku").includes(skuFilter)
+            );
+        }
+
+        return filteredData;
+    }, [barcodeFilter, productsLoading, products, skuFilter]);
 
     function handleEditClick(productId) {
         setEditData(findProduct(productsData, productId));
@@ -73,6 +128,45 @@ export default function ProductList({ productApprove }) {
         });
     }
 
+    function handleBarcodeChange(value) {
+        setBarcodeFilter(value);
+    }
+
+    function handleSkuChange(value) {
+        setSkuFilter(value);
+    }
+
+    const filters = [
+        {
+            key: "barcodeFilter",
+            label: "Barcode",
+            filter: (
+                <TextField
+                    label="Barcode"
+                    value={barcodeFilter}
+                    onChange={handleBarcodeChange}
+                    autoComplete="off"
+                    labelHidden
+                />
+            ),
+            shortcut: true,
+        },
+        {
+            key: "skuFilter",
+            label: "Sku",
+            filter: (
+                <TextField
+                    label="Sku"
+                    value={skuFilter}
+                    onChange={handleSkuChange}
+                    autoComplete="off"
+                    labelHidden
+                />
+            ),
+            shortcut: true,
+        },
+    ];
+
     const [rootClassName, getChildClass] = getClassName({
         rootClass: "product-list",
         styles,
@@ -80,21 +174,37 @@ export default function ProductList({ productApprove }) {
 
     return (
         <div className={rootClassName}>
-            <Card title={`Product List${productApprove ? " Approval" : ""}`}>
-                <Modal
-                    open={showEditModal}
-                    onClose={handleEditOnClose}
-                    large
-                    title="Edit Product"
-                >
-                    <ProductForm
-                        editData={editData}
-                        closeParentModal={handleEditOnClose}
+            <Modal
+                open={showEditModal}
+                onClose={handleEditOnClose}
+                large
+                noScroll
+                title="Edit Product"
+            >
+                <ProductForm
+                    editData={editData}
+                    closeParentModal={handleEditOnClose}
+                />
+            </Modal>
+            <Card title="Filters">
+                <div className={getChildClass("filters")}>
+                    <Filters
+                        queryValue={null}
+                        filters={filters}
+                        appliedFilters={appliedFilters}
+                        onQueryChange={() => null}
+                        onQueryClear={() => null}
+                        onClearAll={handleClearAll}
+                        hideQueryField
                     />
-                </Modal>
-                <section
-                    className={getChildClass("scroll-container")}
-                    ref={scrollerParent}
+                </div>
+            </Card>
+            <section
+                className={getChildClass("scroll-container")}
+                ref={scrollerParent}
+            >
+                <Card
+                    title={`Product List${productApprove ? " Approval" : ""}`}
                 >
                     <InfiniteScroll
                         pageStart={0}
@@ -138,7 +248,7 @@ export default function ProductList({ productApprove }) {
                                             productApprove
                                                 ? "productApprove"
                                                 : "product"
-                                        }__${id.split("/").slice(-1).join("")}`}
+                                        }__${getProductId(id)}`}
                                         position={index}
                                     >
                                         <IndexTable.Cell>
@@ -159,8 +269,21 @@ export default function ProductList({ productApprove }) {
                                                 </TextStyle>
                                             </p>
                                             {mine && <p>{mine?.value}</p>}
-                                            <p>{getVariant(variants, "sku")}</p>
-                                            <p>{tags.join(", ")}</p>
+                                            <p>
+                                                <TextStyle variation="strong">
+                                                    sku:
+                                                </TextStyle>{" "}
+                                                {getVariant(variants, "sku")}
+                                            </p>
+                                            <p>
+                                                <TextStyle variation="strong">
+                                                    barcode:
+                                                </TextStyle>{" "}
+                                                {getVariant(
+                                                    variants,
+                                                    "barcode"
+                                                )}
+                                            </p>
                                         </IndexTable.Cell>
                                         <IndexTable.Cell>
                                             <TextAlign
@@ -209,6 +332,9 @@ export default function ProductList({ productApprove }) {
                                                         }
                                                         productId={id}
                                                         icon="approve"
+                                                        loading={
+                                                            productUpdateLoading
+                                                        }
                                                     />
                                                 ) : (
                                                     <IconButton
@@ -220,6 +346,9 @@ export default function ProductList({ productApprove }) {
                                                         disabled={tags.includes(
                                                             "publishable"
                                                         )}
+                                                        loading={
+                                                            productUpdateLoading
+                                                        }
                                                     />
                                                 )}
                                             </div>
@@ -229,8 +358,8 @@ export default function ProductList({ productApprove }) {
                             )}
                         </IndexTable>
                     </InfiniteScroll>
-                </section>
-            </Card>
+                </Card>
+            </section>
         </div>
     );
 }

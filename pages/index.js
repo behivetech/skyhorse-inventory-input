@@ -41,26 +41,22 @@ const Index = () => {
           };
 
     return (
-        <Page divider>
-            <div style={{ paddingBottom: "4rem" }}>
-                <TitleBar {...titleBarProps} />
-                <ProductList
-                    productApprove={productApproveMode}
-                    key={`productApprove__${productApproveMode}`}
-                />
-                <Modal
-                    open={showProductCreate}
-                    title="Create Product"
-                    onClose={handleProductCreateChange}
-                    large
-                >
-                    <Modal.Section>
-                        <ProductForm
-                            closeParentModal={handleProductCreateChange}
-                        />
-                    </Modal.Section>
-                </Modal>
-            </div>
+        <Page>
+            <TitleBar {...titleBarProps} />
+            <ProductList
+                productApprove={productApproveMode}
+                key={`productApprove__${productApproveMode}`}
+            />
+            <Modal
+                open={showProductCreate}
+                title="Create Product"
+                onClose={handleProductCreateChange}
+                large
+            >
+                <Modal.Section>
+                    <ProductForm closeParentModal={handleProductCreateChange} />
+                </Modal.Section>
+            </Modal>
         </Page>
     );
 };

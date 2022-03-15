@@ -5,6 +5,8 @@
         display: flex;
         gap: 1rem 2rem;
         flex-wrap: wrap;
+        max-height: 12rem;
+        overflow: auto;
         padding: 2rem;
     }
 
@@ -16,5 +18,12 @@
     &__section-half {
         flex: 1 0 0;
         min-width: 20rem;
+    }
+
+    &__upper-form {
+        display: grid;
+        grid-gap: 2rem;
+        grid-template-columns: 16rem auto;
+        padding: .5rem 0 0 1rem;
     }
 }

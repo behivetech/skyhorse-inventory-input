@@ -1,12 +1,6 @@
 import React, { createContext, useCallback, useMemo, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 
-import {
-    getVariant,
-    getMetafield,
-    priceFormat,
-    getProductLink,
-} from "../../tools/dataHelpers";
 import { QUERY_PRODUCT } from "../../graphql/queries";
 import { ADD_PRODUCT, UPDATE_PRODUCT } from "../../graphql/mutations";
 
@@ -29,7 +23,6 @@ const DEFAULT_CONTEXT = {
     productsLoading: false,
     // productsData: [],
     productsHandleLoadMore: () => null,
-    priceFormat: () => null,
     productListVariables: {
         cursor: undefined,
         first: 20,
@@ -132,71 +125,6 @@ export default function ProductsProvider({ children }) {
             reset: productUpdateReset,
         },
     ] = useMutation(UPDATE_PRODUCT); //, mutationOptions);
-    // const productsData = useMemo(() => {
-    //     let returnData = [];
-
-    //     if (!loading && productRows?.length) {
-    //         returnData = productRows.map(
-    //             ({ node: { id, featuredImage, tags, title, variants, metafields } }) => ({
-    //                 id,
-    //                 barcode: getVariant(variants, "barcode"),
-    //                 bin: getMetafield(metafields, "bin"),
-    //                 carat: getMetafield(metafields, "carat"),
-    //                 featuredImage,
-    //                 height: getMetafield(metafields, "height"),
-    //                 length: getMetafield(metafields, "length"),
-    //                 mine: getMetafield(metafields, "mine"),
-    //                 otherLocation: getMetafield(metafields, "otherLocation"),
-    //                 price: getVariant(variants, "price") || "",
-    //                 priceApproved: getMetafield(metafields, "priceApproved"),
-    //                 pricePerCarat: getMetafield(metafields, "pricePerCarat"),
-    //                 sku: getVariant(variants, "sku"),
-    //                 tags,
-    //                 title,
-    //                 type: getMetafield(metafields, "type"),
-    //                 url: getProductLink(id),
-    //                 width: getMetafield(metafields, "width"),
-    //             })
-    //         );
-    //     }
-
-    //     return returnData;
-    // }, [productRows, loading])
-
-    // const getProducts = useCallback((statusIsReady = false) => {
-    //     let returnData = [];
-
-    //     if (!loading && productRows?.length) {
-    //         const productsData = statusIsReady
-    //             ? productRows.filter(({ node: { tags } }) => !tags?.includes('ready'))
-    //             : productRows.filter(({ node: { tags } }) => tags?.includes('ready'));
-
-    //         returnData = productsData.map(
-    //             ({ node: { id, featuredImage, tags, title, variants, metafields } }) => ({
-    //                 id,
-    //                 barcode: getVariant(variants, "barcode"),
-    //                 bin: getMetafield(metafields, "bin"),
-    //                 carat: getMetafield(metafields, "carat"),
-    //                 featuredImage,
-    //                 height: getMetafield(metafields, "height"),
-    //                 length: getMetafield(metafields, "length"),
-    //                 mine: getMetafield(metafields, "mine"),
-    //                 otherLocation: getMetafield(metafields, "otherLocation"),
-    //                 price: getVariant(variants, "price") || "",
-    //                 priceApproved: getMetafield(metafields, "priceApproved"),
-    //                 pricePerCarat: getMetafield(metafields, "pricePerCarat"),
-    //                 sku: getVariant(variants, "sku"),
-    //                 tags,
-    //                 title,
-    //                 type: getMetafield(metafields, "type"),
-    //                 url: getProductLink(id),
-    //                 width: getMetafield(metafields, "width"),
-    //             })
-    //         );
-    //     }
-
-    //     return returnData;
-    // }, [productRows, loading]);
 
     function productsHandleLoadMore() {
         const rowLength = productRows.length;
@@ -230,10 +158,7 @@ export default function ProductsProvider({ children }) {
     }
 
     const context = {
-        // getProducts,
-        priceFormat,
         products: productRows,
-        // productsData,
         productsError: error,
         productsHandleLoadMore,
         productsHasNextPage: hasNextPage,
