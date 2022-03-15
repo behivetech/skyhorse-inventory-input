@@ -32,7 +32,12 @@ export default function ProductForm({
     closeParentModal = () => null,
     editData = {},
 }) {
-    const { editDataExists, defaultValues } = useMemo(() => {
+    const {
+        editDataExists,
+        defaultValues,
+        hasReady,
+        hasPublish,
+    } = useMemo(() => {
         const defaultValues = {};
         const editDataExists = !!editData.id;
         let editValue = null;
@@ -55,6 +60,8 @@ export default function ProductForm({
         return {
             defaultValues,
             editDataExists,
+            hasReady: editData.tags.includes("ready"),
+            hasPublish: editData.tags.includes("publishable"),
         };
     }, [editData]);
     const [stabilized, setStabilized] = useState(
@@ -152,8 +159,9 @@ export default function ProductForm({
                   .toUpperCase()
             : "NA";
         const slot = barcode.toString().charAt(0);
-        const uniqueId = editData.sku
-            ? editData.sku?.split("-").slice(-1).join("")
+        const editSku = getVariant(editData?.variants, "sku");
+        const uniqueId = editSku
+            ? editSku.split("-").slice(-1).join("")
             : getRandomNumber(3);
         return `${typeCode}-${mineCode}-B${bin}S${slot}-${uniqueId}`;
     }
@@ -173,10 +181,26 @@ export default function ProductForm({
         return parseFloat(pricePerCarat * carat).toFixed(2);
     }
 
+    function getTags(tags) {
+        const combinedTags = [...tags];
+
+        if (hasReady) {
+            combinedTags.push("ready");
+        }
+
+        if (hasPublish) {
+            combinedTags.push("publishable");
+        }
+
+        return combinedTags;
+    }
+
+    console.log(getVariant(editData?.variants, "barcode"));
     function getProductInputs(formData) {
         const { pricePerCarat, type, mine, carat, bin } = formData || {};
-        const tags = [type, mine];
-        const barcode = editData.barcode || getBarcode();
+        const tags = getTags([type, mine]);
+        const barcode =
+            getVariant(editData?.variants, "barcode") || getBarcode();
         const price = getPrice(pricePerCarat, carat);
         const title = `${type}${stabilized ? ` (Stabilized)` : ""}${
             mine ? ` - ${mine}` : ""

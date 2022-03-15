@@ -28,7 +28,7 @@ const DEFAULT_CONTEXT = {
         first: 20,
         query: "status:draft",
         reverse: true,
-        sortKey: "CREATED_AT",
+        sortKey: "UPDATED_AT",
     },
     setProductListVariables: () => null,
 };

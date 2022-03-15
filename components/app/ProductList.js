@@ -3,7 +3,6 @@ import InfiniteScroll from "react-infinite-scroller";
 import {
     Card,
     Filters,
-    Heading,
     IndexTable,
     Link,
     Modal,
