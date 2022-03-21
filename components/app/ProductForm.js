@@ -278,7 +278,6 @@ export default function ProductForm({
     }
 
     function onSubmit(formData) {
-        // console.log(getProductInputs(formData));
         productSubmit(getProductInputs(formData));
     }
 

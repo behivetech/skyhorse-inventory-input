@@ -178,8 +178,13 @@ export default function ProductList({ productApprove }) {
                         loadMore={productsHandleLoadMore}
                         getScrollParent={() => scrollerParent.current}
                         hasMore={hasMore}
-                        loader={<Spinner key="spinner" />}
-                        threshold={1800}
+                        loader={
+                            <div>
+                                <Spinner key="spinner" /> Loading more
+                                products...
+                            </div>
+                        }
+                        threshold={100}
                         useWindow={false}
                     >
                         <IndexTable
@@ -201,7 +206,7 @@ export default function ProductList({ productApprove }) {
                             ]}
                             hasMoreItems={hasMore}
                             itemCount={productsData.length}
-                            loading={productsLoading}
+                            loading={false}
                             resourceName={resourceName}
                             selectable={false}
                         >
