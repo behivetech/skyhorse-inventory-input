@@ -43,11 +43,12 @@ function MyProvider(props) {
         cache: new InMemoryCache({
             typePolicies: {
                 Products: {
-                    fields: {
-                        products: {
-                            keyArgs: ["query"],
-                        },
-                    },
+                    keyFields: false,
+                    // fields: {
+                    //     products: {
+                    //         keyArgs: ["query"],
+                    //     },
+                    // },
                 },
             },
         }),

@@ -28,7 +28,7 @@ const DEFAULT_CONTEXT = {
     productListVariables: {
         cursor: undefined,
         first: TOTAL_QUERY_ROWS,
-        query: "status:draft",
+        query: "status:draft tag:ready",
         reverse: true,
         sortKey: "UPDATED_AT",
     },
@@ -92,6 +92,7 @@ export default function ProductsProvider({ children }) {
         error,
         fetchMore,
         loading,
+        refetch,
     } = useQuery(QUERY_PRODUCT, {
         variables: productListVariables,
     });
@@ -169,11 +170,18 @@ export default function ProductsProvider({ children }) {
         productUpdateLoading,
         productUpdateReset,
         productListVariables,
-        setProductListVariables: (newVariables) =>
-            setProductListVariablesState({
+        setProductListVariables: (type) => {
+            const searches = {
+                edit: "status:draft tag_not:ready",
+                ready: "status:draft tag:ready",
+            };
+            const newProductListVariables = {
                 ...productListVariables,
-                ...newVariables,
-            }),
+                query: searches[type],
+            };
+
+            setProductListVariablesState(newProductListVariables);
+        },
     };
 
     return (

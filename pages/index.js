@@ -3,7 +3,7 @@ import { Modal, Page } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 
 import ProductForm from "../components/app/ProductForm";
-import ProductList from "../components/app/ProductList";
+import { ProductList } from "../components/app/product-list";
 import useProducts from "../hooks/useProducts";
 
 const Index = () => {
@@ -14,8 +14,10 @@ const Index = () => {
         () => setShowProductCreate(!showProductCreate),
         [showProductCreate]
     );
+    const { setProductListVariables } = useProducts();
     const handleSwitchList = useCallback(() => {
         setProductApproveMode(!productApproveMode);
+        setProductListVariables(productApproveMode ? "edit" : "ready");
     }, [productApproveMode]);
 
     const titleBarProps = productApproveMode
