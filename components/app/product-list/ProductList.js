@@ -178,20 +178,31 @@ export default function ProductList({ productApprove }) {
                         loadMore={productsHandleLoadMore}
                         getScrollParent={() => scrollerParent.current}
                         hasMore={hasMore}
-                        loader={productsLoading && <Spinner key="spinner" />}
+                        loader={<Spinner key="spinner" />}
                         threshold={1800}
                         useWindow={false}
                     >
                         <IndexTable
-                            resourceName={resourceName}
-                            itemCount={productsData.length}
+                            emptyState={
+                                productsLoading ? (
+                                    <div>
+                                        <Spinner />
+                                        Loading...
+                                    </div>
+                                ) : (
+                                    <div>No products found.</div>
+                                )
+                            }
                             headings={[
                                 { title: `Count: ${productsData.length}` },
                                 { title: "Type/Mine/Sku" },
                                 { title: "Carat/Price" },
                                 { title: "Action" },
                             ]}
+                            hasMoreItems={hasMore}
+                            itemCount={productsData.length}
                             loading={productsLoading}
+                            resourceName={resourceName}
                             selectable={false}
                         >
                             <ProductRows

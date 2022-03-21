@@ -5,7 +5,6 @@ import debounce from "lodash.debounce";
 import { QUERY_PRODUCT } from "../../graphql/queries";
 import { ADD_PRODUCT, UPDATE_PRODUCT } from "../../graphql/mutations";
 
-const TOTAL_QUERY_ROWS = 20;
 const DEFAULT_CONTEXT = {
     cursors: [],
     // getProducts: () => [],
@@ -27,8 +26,8 @@ const DEFAULT_CONTEXT = {
     productsHandleLoadMore: () => null,
     productListVariables: {
         cursor: undefined,
-        first: TOTAL_QUERY_ROWS,
-        query: "status:draft tag:ready",
+        first: +TOTAL_QUERY_ROWS,
+        query: "status:draft",
         reverse: true,
         sortKey: "UPDATED_AT",
     },
@@ -39,44 +38,12 @@ const PRODUCT_MUTATIONS = {
     update: UPDATE_PRODUCT,
 };
 
-let mutationType = "update";
-
 export const ProductListContext = createContext(DEFAULT_CONTEXT);
 
 export default function ProductsProvider({ children }) {
     const [productListVariables, setProductListVariablesState] = useState(
         DEFAULT_CONTEXT.productListVariables
     );
-    // const mutationOptions = useMemo(() => {
-    //     return {
-    //         update(cache, { data }) {
-    //             // We use an update function here to write the
-    //             // new value of the GET_ALL_TODOS query.
-    //             const newProductFromResponse = data?.productUpdate.product;
-    //             const existingProducts = cache.readQuery({
-    //                 query: QUERY_PRODUCT,
-    //                 variables: productListVariables,
-    //             });
-    //             })
-    //             // if (newProductFromResponse) {
-    //             //     const newProductRecord = {
-    //             //         ...existingProducts?.products?.edges.find(({node}) => newProductFromResponse.id === node.id),
-    //             //     }
-    //             //     cache.writeQuery({
-    //             //         query: QUERY_PRODUCT,
-    //             //         data: {
-    //             //             products: {
-    //             //                 edges: [
-    //             //                     ...existingProducts?.products.edges,
-    //             //                     newProductFromResponse,
-    //             //                 ],
-    //             //             },
-    //             //         },
-    //             //     });
-    //             // }
-    //         },
-    //     }
-    // }, [productListVariables]);
     const {
         data: {
             products: {
@@ -131,7 +98,7 @@ export default function ProductsProvider({ children }) {
         if (rowLength > TOTAL_QUERY_ROWS - 1) {
             fetchMore({
                 variables: fetchVariables,
-                updateQuery: (previousResult, { fetchMoreResult, ...rest }) => {
+                updateQuery: (previousResult, { fetchMoreResult }) => {
                     const newEdges = fetchMoreResult.products.edges;
                     const pageInfo = fetchMoreResult.products.pageInfo;
 
@@ -151,7 +118,7 @@ export default function ProductsProvider({ children }) {
                 },
             });
         }
-    }, 1200);
+    }, QUERY_DELAY);
 
     const context = {
         products: productRows,
@@ -169,19 +136,6 @@ export default function ProductsProvider({ children }) {
         productUpdateError,
         productUpdateLoading,
         productUpdateReset,
-        productListVariables,
-        setProductListVariables: (type) => {
-            const searches = {
-                edit: "status:draft tag_not:ready",
-                ready: "status:draft tag:ready",
-            };
-            const newProductListVariables = {
-                ...productListVariables,
-                query: searches[type],
-            };
-
-            setProductListVariablesState(newProductListVariables);
-        },
     };
 
     return (

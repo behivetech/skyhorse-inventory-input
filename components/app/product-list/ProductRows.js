@@ -27,7 +27,6 @@ export default function ProductRows({
     const { productUpdate, productUpdateLoading } = useProducts();
 
     function handleEditClick(productId) {
-        console.log("edit clicked");
         setEditData(findProduct(productsData, productId));
         setShowEditModal(true);
     }
@@ -35,7 +34,6 @@ export default function ProductRows({
     function handleReadyClick(productId) {
         const { id, tags } = findProduct(productsData, productId);
 
-        console.log({ id, tags });
         productUpdate({
             variables: { input: { id, tags: [...tags, "ready"].join(", ") } },
         });
