@@ -14,10 +14,8 @@ const Index = () => {
         () => setShowProductCreate(!showProductCreate),
         [showProductCreate]
     );
-    const { setProductListVariables } = useProducts();
     const handleSwitchList = useCallback(() => {
         setProductApproveMode(!productApproveMode);
-        setProductListVariables(productApproveMode ? "edit" : "ready");
     }, [productApproveMode]);
 
     const titleBarProps = productApproveMode
