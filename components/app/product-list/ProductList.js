@@ -184,7 +184,7 @@ export default function ProductList({ productApprove }) {
                                 products...
                             </div>
                         }
-                        threshold={20000}
+                        threshold={+INFINITE_SCROLL_THRESHOLD}
                         useWindow={false}
                     >
                         <IndexTable
