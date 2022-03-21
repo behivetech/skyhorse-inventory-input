@@ -184,7 +184,7 @@ export default function ProductList({ productApprove }) {
                                 products...
                             </div>
                         }
-                        threshold={100}
+                        threshold={20000}
                         useWindow={false}
                     >
                         <IndexTable
