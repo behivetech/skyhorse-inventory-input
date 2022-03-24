@@ -179,7 +179,7 @@ export default function ProductList({ productApprove }) {
                         getScrollParent={() => scrollerParent.current}
                         hasMore={hasMore}
                         loader={
-                            <div>
+                            <div key={`InfiniteScrollLoader__${Date.now()}`}>
                                 <Spinner key="spinner" /> Loading more
                                 products...
                             </div>

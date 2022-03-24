@@ -29,3 +29,27 @@ export const QUERY_PRODUCT = gql`
         }
     }
 `;
+
+export const PRODUCTS_LOCAL_QUERY = gql`
+    query LocalProducts($jsonlUrl: String) {
+        products(jsonlUrl: $jsonlUrl) {
+            name
+        }
+    }
+`;
+
+export const PRODUCTS_BULK_OPERATION = gql`
+    query {
+        currentBulkOperation {
+            id
+            status
+            errorCode
+            createdAt
+            completedAt
+            objectCount
+            fileSize
+            url
+            partialDataUrl
+        }
+    }
+`;

@@ -20,7 +20,7 @@ Shopify.Context.initialize({
     API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
     SCOPES: process.env.SCOPES.split(","),
     HOST_NAME: process.env.HOST.replace(/https:\/\/|\/$/g, ""),
-    API_VERSION: ApiVersion.October20,
+    API_VERSION: ApiVersion.January22,
     IS_EMBEDDED_APP: true,
     // This should be replaced with your preferred storage strategy
     SESSION_STORAGE: new Shopify.Session.MemorySessionStorage(),
@@ -73,6 +73,10 @@ app.prepare().then(async () => {
         ctx.res.statusCode = 200;
     };
 
+    const handleApiRequest = async (ctx) => {
+        await handle(ctx.req, ctx.res, ctx.parsedUrl);
+    };
+
     router.post("/webhooks", async (ctx) => {
         try {
             await Shopify.Webhooks.Registry.process(ctx.req, ctx.res);
@@ -90,6 +94,7 @@ app.prepare().then(async () => {
         }
     );
 
+    router.post("/api/products", handleApiRequest);
     router.get("(/_next/static/.*)", handleRequest); // Static content is clear
     router.get("/_next/webpack-hmr", handleRequest); // Webpack content is clear
     router.get("(.*)", async (ctx) => {

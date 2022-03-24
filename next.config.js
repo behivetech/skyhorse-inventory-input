@@ -3,6 +3,7 @@ const { parsed: localEnv } = require("dotenv").config();
 const webpack = require("webpack");
 const API_KEY = JSON.stringify(process.env.SHOPIFY_API_KEY);
 const SHOP = JSON.stringify(process.env.SHOP);
+const HOST = JSON.stringify(process.env.HOST);
 const QUERY_DELAY = JSON.stringify(process.env.QUERY_DELAY);
 const TOTAL_QUERY_ROWS = JSON.stringify(process.env.TOTAL_QUERY_ROWS);
 const INFINITE_SCROLL_THRESHOLD = JSON.stringify(
@@ -13,6 +14,7 @@ module.exports = {
     webpack: (config) => {
         const env = {
             API_KEY,
+            HOST,
             SHOP,
             QUERY_DELAY,
             TOTAL_QUERY_ROWS,
