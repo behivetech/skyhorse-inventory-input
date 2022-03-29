@@ -9,6 +9,13 @@ const TOTAL_QUERY_ROWS = JSON.stringify(process.env.TOTAL_QUERY_ROWS);
 const INFINITE_SCROLL_THRESHOLD = JSON.stringify(
     process.env.INFINITE_SCROLL_THRESHOLD
 );
+// const ContentSecurityPolicy = `
+//   default-src 'self';
+//   script-src 'self';
+//   child-src example.com;
+//   style-src 'self' example.com;
+//   font-src 'self';
+// `
 
 module.exports = {
     webpack: (config) => {

@@ -40,12 +40,29 @@ export default function ProductRows({
     }
 
     function handleApproveClick(productId) {
-        const { id, tags } = findProduct(productsData, productId);
+        const { id, priceApproved, tags } = findProduct(
+            productsData,
+            productId
+        );
         const newTags = tags.filter((tag) => tag !== "ready");
+        const priceApprovedMetafield = priceApproved
+            ? {
+                  id: priceApproved?.id,
+                  value: "true",
+              }
+            : {
+                  key: "priceApproved",
+                  namespace: "my_fields",
+                  value: "true",
+              };
 
         productUpdate({
             variables: {
-                input: { id, tags: [...newTags, "publishable"].join(", ") },
+                input: {
+                    id,
+                    tags: [...newTags, "publishable"].join(", "),
+                    metafields: [priceApprovedMetafield],
+                },
             },
         });
     }
