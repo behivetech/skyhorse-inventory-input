@@ -67,6 +67,7 @@ export default function ProductForm({
     const [stabilized, setStabilized] = useState(
         editData.title?.includes("Stabilized") || false
     );
+    const [sets, setSets] = useState(editData.tags?.includes("set") || false);
     const {
         control,
         formState: { errors: fieldErrors },
@@ -76,8 +77,12 @@ export default function ProductForm({
         defaultValues,
         resolver: yupResolver(schema),
     });
-    const handleChange = useCallback(
+    const handleStabilizedChange = useCallback(
         (newChecked) => setStabilized(newChecked),
+        []
+    );
+    const handleSetsChange = useCallback(
+        (newChecked) => setSets(newChecked),
         []
     );
     const {
@@ -190,6 +195,10 @@ export default function ProductForm({
 
         if (hasPublish) {
             combinedTags.push("publishable");
+        }
+
+        if (sets) {
+            combinedTags.push("Set");
         }
 
         return combinedTags;
@@ -368,7 +377,12 @@ export default function ProductForm({
                         <Checkbox
                             label="Stabilized"
                             checked={stabilized}
-                            onChange={handleChange}
+                            onChange={handleStabilizedChange}
+                        />
+                        <Checkbox
+                            label="Set"
+                            checked={sets}
+                            onChange={handleSetsChange}
                         />
                     </div>
                     <div className={getChildClass("layout")}>
