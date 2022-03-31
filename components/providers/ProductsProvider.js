@@ -3,6 +3,7 @@ import React, {
     useCallback,
     useEffect,
     useMemo,
+    useRef,
     useState,
 } from "react";
 import { useLazyQuery, useQuery, useMutation } from "@apollo/client";
@@ -52,6 +53,7 @@ const PRODUCT_MUTATIONS = {
     create: ADD_PRODUCT,
     update: UPDATE_PRODUCT,
 };
+const MAX_QUERY_DELAY = +QUERY_DELAY * 3;
 
 export const ProductListContext = createContext(DEFAULT_CONTEXT);
 
@@ -60,6 +62,9 @@ export default function ProductsProvider({ children }) {
     const [productListVariables, setProductListVariablesState] = useState(
         DEFAULT_CONTEXT.productListVariables
     );
+    const queryTimestamps = useRef([]);
+    const queryDelay = useRef(QUERY_DELAY);
+
     const {
         data: {
             products: {
@@ -212,6 +217,26 @@ export default function ProductsProvider({ children }) {
             ...productListVariables,
             cursor: lastProduct.cursor,
         };
+        const lastQueryTimestamp = queryTimestamps.current.length
+            ? Math.floor(
+                  (Date.now() - queryTimestamps.current.slice(-1)) / 1000
+              )
+            : 0;
+        if (queryTimestamps.current.length && lastQueryTimestamp > 20) {
+            queryTimestamps.current = [];
+            queryDelay.current = QUERY_DELAY;
+        } else {
+            queryTimestamps.current.push(Date.now());
+            const newQueryDelay =
+                (+QUERY_DELAY * (queryTimestamps.current.length + 1)) / 1.5;
+
+            if (
+                newQueryDelay > queryDelay.current &&
+                newQueryDelay <= MAX_QUERY_DELAY
+            ) {
+                queryDelay.current = newQueryDelay;
+            }
+        }
 
         if (rowLength > TOTAL_QUERY_ROWS - 1) {
             fetchMore({
@@ -219,24 +244,32 @@ export default function ProductsProvider({ children }) {
                 updateQuery: (previousResult, { fetchMoreResult }) => {
                     const newEdges = fetchMoreResult.products.edges;
                     const pageInfo = fetchMoreResult.products.pageInfo;
+                    let results = previousResult;
 
-                    return newEdges.length
-                        ? {
-                              products: {
-                                  __typename:
-                                      previousResult.products.__typename,
-                                  edges: [
-                                      ...previousResult.products.edges,
-                                      ...newEdges,
-                                  ],
-                                  pageInfo,
-                              },
-                          }
-                        : previousResult;
+                    if (newEdges.length) {
+                        const newEdgesIds = newEdges.map(
+                            ({ node: { id } }) => id
+                        );
+                        const filteredEdges = previousResult.products.edges.filter(
+                            ({ node: { id } }) => !newEdgesIds.includes(id)
+                        );
+
+                        results = {
+                            products: {
+                                __typename: previousResult.products.__typename,
+                                edges: [...filteredEdges, ...newEdges],
+                                pageInfo,
+                            },
+                        };
+                    }
+
+                    return results;
                 },
             });
         }
-    }, QUERY_DELAY);
+
+        console.log("DELAY", queryDelay.current);
+    }, queryDelay.current);
 
     const context = {
         products: productRows,
