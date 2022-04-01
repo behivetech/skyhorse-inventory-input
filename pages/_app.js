@@ -102,11 +102,33 @@ function MyProvider(props) {
                     fields: {
                         products: {
                             keyArgs: ["query"],
+                            merge: (
+                                existing = { edges: [] },
+                                incoming = { edges: [] }
+                            ) => {
+                                const newEdges = incoming.edges;
+                                const pageInfo = incoming.pageInfo;
+                                let results = existing;
+
+                                if (newEdges.length) {
+                                    const newEdgesIds = newEdges.map(
+                                        ({ node: { id } }) => id
+                                    );
+                                    const filteredEdges = existing.edges.filter(
+                                        ({ node: { id } }) =>
+                                            !newEdgesIds.includes(id)
+                                    );
+
+                                    results = {
+                                        edges: [...filteredEdges, ...newEdges],
+                                        pageInfo,
+                                    };
+                                }
+
+                                return results;
+                            },
                         },
                     },
-                    //     merge(existing = [], incoming) {
-                    //         return [...existing, ...incoming];
-                    //     },
                 },
             },
         }),
