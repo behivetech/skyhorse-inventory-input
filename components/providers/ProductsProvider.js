@@ -241,30 +241,30 @@ export default function ProductsProvider({ children }) {
         if (rowLength > TOTAL_QUERY_ROWS - 1) {
             fetchMore({
                 variables: fetchVariables,
-                // updateQuery: (previousResult, { fetchMoreResult }) => {
-                //     const newEdges = fetchMoreResult.products.edges;
-                //     const pageInfo = fetchMoreResult.products.pageInfo;
-                //     let results = previousResult;
+                updateQuery: (previousResult, { fetchMoreResult }) => {
+                    const newEdges = fetchMoreResult.products.edges;
+                    const pageInfo = fetchMoreResult.products.pageInfo;
+                    let results = previousResult;
 
-                //     if (newEdges.length) {
-                //         const newEdgesIds = newEdges.map(
-                //             ({ node: { id } }) => id
-                //         );
-                //         const filteredEdges = previousResult.products.edges.filter(
-                //             ({ node: { id } }) => !newEdgesIds.includes(id)
-                //         );
+                    if (newEdges.length) {
+                        const newEdgesIds = newEdges.map(
+                            ({ node: { id } }) => id
+                        );
+                        const filteredEdges = previousResult.products.edges.filter(
+                            ({ node: { id } }) => !newEdgesIds.includes(id)
+                        );
 
-                //         results = {
-                //             products: {
-                //                 __typename: previousResult.products.__typename,
-                //                 edges: [...filteredEdges, ...newEdges],
-                //                 pageInfo,
-                //             },
-                //         };
-                //     }
+                        results = {
+                            products: {
+                                __typename: previousResult.products.__typename,
+                                edges: [...filteredEdges, ...newEdges],
+                                pageInfo,
+                            },
+                        };
+                    }
 
-                //     return results;
-                // },
+                    return results;
+                },
             });
         }
 
