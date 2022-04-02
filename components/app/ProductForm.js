@@ -67,7 +67,7 @@ export default function ProductForm({
     const [stabilized, setStabilized] = useState(
         editData.title?.includes("Stabilized") || false
     );
-    const [sets, setSets] = useState(editData.tags?.includes("set") || false);
+    const [sets, setSets] = useState(editData.tags?.includes("Set") || false);
     const {
         control,
         formState: { errors: fieldErrors },

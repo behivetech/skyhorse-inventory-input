@@ -10,7 +10,7 @@ import {
 } from "@shopify/polaris";
 
 import getClassName from "../../../tools/getClassName";
-import { getVariant } from "../../../tools/dataHelpers";
+import { getVariant, priceFormat } from "../../../tools/dataHelpers";
 import ProductForm from "../ProductForm";
 import styles from "./ProductList.module.scss";
 import useProducts from "../../../hooks/useProducts";
@@ -87,6 +87,24 @@ export default function ProductList({ productApprove }) {
 
         return filteredData;
     }, [barcodeFilter, productsLoading, products, skuFilter]);
+    const totalPricing = useMemo(() => {
+        let total = 0;
+
+        if (!productsLoading && productsData && productsData?.length) {
+            for (let pIndex in productsData) {
+                const { variants } = productsData[pIndex].node || {
+                    variants: [],
+                };
+
+                if (variants) {
+                    total += +getVariant(variants, "price");
+                }
+            }
+        }
+
+        return total;
+    }, [productsData, productsLoading]);
+
     const hasMore = useMemo(() => {
         return !productsLoading && productsHasNextPage;
     }, [productsLoading, productsHasNextPage]);
@@ -171,7 +189,9 @@ export default function ProductList({ productApprove }) {
                 ref={scrollerParent}
             >
                 <Card
-                    title={`Product List${productApprove ? " Approval" : ""}`}
+                    title={`Product List${
+                        productApprove ? " Approval" : ""
+                    } $${priceFormat(totalPricing)}`}
                 >
                     <InfiniteScroll
                         pageStart={0}
