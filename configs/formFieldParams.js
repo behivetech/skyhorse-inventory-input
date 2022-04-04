@@ -4,7 +4,7 @@ const formFieldParams = {
     pricePerCarat: {
         label: "Price Per Carat",
         type: "number",
-        validation: yup.required(),
+        validation: yup.number().positive().required(),
         inputFieldParams: {
             fieldType: "text",
         },
@@ -12,7 +12,7 @@ const formFieldParams = {
     carat: {
         label: "Carat",
         type: "number",
-        validation: yup.required(),
+        validation: yup.number().positive().required(),
         inputFieldParams: {
             fieldType: "text",
         },

@@ -12,6 +12,12 @@ export default function TextFieldControlled({
     helpText,
     type = "text",
 }) {
+    const numberProps =
+        type === "number"
+            ? {
+                  step: "any",
+              }
+            : {};
     return (
         <Controller
             control={control}
@@ -27,6 +33,7 @@ export default function TextFieldControlled({
                     placeholder={placeholder}
                     value={value}
                     type={type}
+                    {...numberProps}
                 />
             )}
         />
