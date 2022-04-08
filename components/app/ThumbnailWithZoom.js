@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Button, Modal, Thumbnail } from "@shopify/polaris";
+
 import NoImage from "../core/NoImage";
 
 export default function ThumbnailWithZoom({ alt, src }) {

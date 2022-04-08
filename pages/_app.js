@@ -18,6 +18,7 @@ import {
 import { authenticatedFetch } from "@shopify/app-bridge-utils";
 import { Redirect } from "@shopify/app-bridge/actions";
 import "@shopify/polaris/build/esm/styles.css";
+import "../styles/polaris-overrides.scss";
 import translations from "@shopify/polaris/locales/en.json";
 
 import ProductsProvider from "../components/providers/ProductsProvider";
