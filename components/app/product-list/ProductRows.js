@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
-import { IndexTable, Link, TextStyle } from "@shopify/polaris";
+import { Icon, IndexTable, Link, TextStyle } from "@shopify/polaris";
+import { FlagMajor } from "@shopify/polaris-icons";
 
 import {
     getProductId,
@@ -105,6 +106,14 @@ export default function ProductRows({
                     <p>
                         <TextStyle variation="strong">
                             <Link url={getProductLink(id)} external>
+                                {tags?.includes("Flagged") && (
+                                    <div className={getChildClass("flag")}>
+                                        <Icon
+                                            source={FlagMajor}
+                                            color="critical"
+                                        />
+                                    </div>
+                                )}
                                 {title?.split(" - ")[0]}
                             </Link>
                         </TextStyle>

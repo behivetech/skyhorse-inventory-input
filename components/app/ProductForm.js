@@ -67,6 +67,9 @@ export default function ProductForm({
     const [stabilized, setStabilized] = useState(
         editData.title?.includes("Stabilized") || false
     );
+    const [flagged, setFlagged] = useState(
+        editData.tags?.includes("Flagged") || false
+    );
     const [sets, setSets] = useState(editData.tags?.includes("Set") || false);
     const {
         control,
@@ -85,6 +88,7 @@ export default function ProductForm({
         (newChecked) => setSets(newChecked),
         []
     );
+    const handleFlaggedChange = useCallback(() => setFlagged(!flagged), []);
     const {
         productCreate,
         productCreateData,
@@ -199,6 +203,10 @@ export default function ProductForm({
 
         if (sets) {
             combinedTags.push("Set");
+        }
+
+        if (flagged) {
+            combinedTags.push("Flagged");
         }
 
         return combinedTags;
@@ -383,6 +391,11 @@ export default function ProductForm({
                             label="Set"
                             checked={sets}
                             onChange={handleSetsChange}
+                        />
+                        <Checkbox
+                            label="Flagged"
+                            checked={flagged}
+                            onChange={handleFlaggedChange}
                         />
                     </div>
                     <div className={getChildClass("layout")}>
