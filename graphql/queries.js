@@ -6,7 +6,6 @@ export const QUERY_PRODUCT = gql`
     query Products(
         $cursor: String
         $first: Int
-        $query: String!
         $reverse: Boolean
         $sortKey: ProductSortKeys
     ) {
@@ -15,7 +14,6 @@ export const QUERY_PRODUCT = gql`
             first: $first
             reverse: $reverse
             sortKey: $sortKey
-            query: $query
         ) {
             edges {
                 cursor

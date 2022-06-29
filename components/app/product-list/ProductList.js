@@ -57,6 +57,7 @@ export default function ProductList({ productApprove }) {
         return currentFilters;
     }, [skuFilter, barcodeFilter]);
     const {
+        logProducts,
         products,
         productsLoading,
         productsHandleLoadMore,
@@ -159,6 +160,7 @@ export default function ProductList({ productApprove }) {
 
     return (
         <div className={rootClassName}>
+            <button onClick={logProducts}>Log Products</button>
             <Modal
                 open={showEditModal}
                 onClose={handleEditOnClose}

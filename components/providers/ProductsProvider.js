@@ -43,7 +43,7 @@ const DEFAULT_CONTEXT = {
     productListVariables: {
         cursor: undefined,
         first: +TOTAL_QUERY_ROWS,
-        query: "status:draft",
+        query: "status:active",
         reverse: true,
         sortKey: "UPDATED_AT",
     },
@@ -271,7 +271,12 @@ export default function ProductsProvider({ children }) {
         console.log("DELAY", queryDelay.current);
     }, queryDelay.current);
 
+    function logProducts() {
+        console.log(productRows);
+    }
+
     const context = {
+        logProducts,
         products: productRows,
         productsError: error,
         productsHandleLoadMore,
